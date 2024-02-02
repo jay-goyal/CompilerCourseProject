@@ -4,6 +4,6 @@
 
 int main(int argc, char *argv[]) {
     unsigned int val = hash("HELLO");
-    printf("%du\n", val);
+    printf("%u\n", val);
     return 0;
 }

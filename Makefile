@@ -6,7 +6,7 @@ INCDIR := include
 
 CC := gcc
 CFLAGS := -c -Wall -O1
-DBGFLAGS := -ggdb
+DBGFLAGS := -c -Wall -ggdb
 
 SOURCES := $(shell find $(SRCDIR) -type f -iname '*.c')
 TGTOBJ := $(subst src,$(TGTDIR),$(SOURCES:.c=.o))
@@ -27,7 +27,7 @@ clean:
 	rm -rf $(BUILDDIR)
 
 $(DBGDIR)/%.o: $(SRCDIR)/%.c
-	$(CC) -o $@ $(CFLAGS) $(DBGFLAGS) $<
+	$(CC) -o $@ $(DBGFLAGS) $<
 
 $(TGTDIR)/%.o: $(SRCDIR)/%.c
 	$(CC) -o $@ $(CFLAGS) $<
