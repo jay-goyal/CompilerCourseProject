@@ -1,48 +1,59 @@
+#include "LinkedList.h"
+
+#include <stdio.h>
 #include <stdlib.h>
 
-struct Node {
-    int val;
-    struct Node* next;
-};
-
-struct Node* makeNode(int val){
-    struct Node* temp=(struct Node*)malloc(sizeof(struct Node));
-    if(temp==NULL){
+node_t* make_node(char** key, int val) {
+    node_t* temp = (node_t*)malloc(sizeof(node_t));
+    if (temp == NULL) {
         printf("Mem Alloc failed");
     }
-    temp->val=val;
-    temp->next=NULL;
+    temp->key = key;
+    temp->val = val;
+    temp->next = NULL;
     return temp;
 }
 
-void insert_tail_node(struct Node* head, int val){
-    struct Node* tail=makeNode(val);
+void insert_tail_node(node_t* head, char** key, int val) {
+    node_t* tail = make_node(key, val);
 
-    if(head==NULL){
-        head=tail;
+    if (head == NULL) {
+        head = tail;
         return;
     }
-    struct Node* temp=head;
-    while(temp->next != NULL){
-        temp=temp->next;
+    node_t* temp = head;
+    while (temp->next != NULL) {
+        temp = temp->next;
     }
-    temp->next=tail;
+    temp->next = tail;
 }
 
-void delete_tail_node(struct Node* head){
-    if(head==NULL){
+void delete_tail_node(node_t* head) {
+    if (head == NULL) {
         return;
     }
-    if(head->next==NULL){
+    if (head->next == NULL) {
         free(head);
-        head=NULL;
+        head = NULL;
         return;
     }
-    struct Node* temp=head;
-    while(temp->next->next != NULL){
-        temp=temp->next;
-
+    node_t* temp = head;
+    while (temp->next->next != NULL) {
+        temp = temp->next;
     }
     free(temp->next);
-    temp->next=NULL;
+    temp->next = NULL;
+}
+
+void delete_list(node_t* head) {
+    if (head == NULL) {
+        return;
+    }
+
+    node_t* temp = head;
+    while (temp != NULL) {
+        node_t* next = temp->next;
+        free(temp);
+        temp = next;
+    }
 }

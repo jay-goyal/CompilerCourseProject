@@ -9,6 +9,7 @@ CFLAGS := -c -Wall -O1
 DBGFLAGS := -c -Wall -ggdb
 
 SOURCES := $(shell find $(SRCDIR) -type f -iname '*.c')
+HEADERS := $(shell find $(SRCDIR) -type f -iname '*.h')
 TGTOBJ := $(subst src,$(TGTDIR),$(SOURCES:.c=.o))
 DBGOBJ := $(subst src,$(DBGDIR),$(SOURCES:.c=.o))
 TGTDIRS := $(subst src,$(TGTDIR),$(dir $(SOURCES)))
@@ -17,7 +18,7 @@ DBGDIRS := $(subst src,$(DBGDIR),$(dir $(SOURCES)))
 run: target
 	./$(TGTDIR)/compiler
 
-target: $(TGTDIRS) $(SOURCES) $(TGTOBJ)
+target: $(TGTDIRS) $(SOURCES) $(HEADERS) $(TGTOBJ)
 	$(CC) -o $(TGTDIR)/compiler $(TGTOBJ)
 
 debug: $(DBGDIRS) $(SOURCES) $(DBGOBJ)
@@ -26,10 +27,10 @@ debug: $(DBGDIRS) $(SOURCES) $(DBGOBJ)
 clean:
 	rm -rf $(BUILDDIR)
 
-$(DBGDIR)/%.o: $(SRCDIR)/%.c
+$(DBGDIR)/%.o: $(SRCDIR)/%.c $(HEADERS)
 	$(CC) -o $@ $(DBGFLAGS) $<
 
-$(TGTDIR)/%.o: $(SRCDIR)/%.c
+$(TGTDIR)/%.o: $(SRCDIR)/%.c $(HEADERS)
 	$(CC) -o $@ $(CFLAGS) $<
 
 $(TGTDIRS):
