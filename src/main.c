@@ -2,6 +2,7 @@
 
 #include "hash_table/hash_table.h"
 #include "linked_list/LinkedList.h"
+#include "lexical_analyzer/transition_diagram.h"
 
 int main(int argc, char* argv[]) {
     printf("RUNNING\n");
@@ -32,5 +33,20 @@ int main(int argc, char* argv[]) {
             printf("\n");
         }
     }
+    
+    State* td = create_transition_diagram();
+    for(int i=0; i<64; i++) {
+        printf("State %d: ", i);
+        printf("Transitions: %d ", td[i]->transitions.size);
+        printf("Retract: %d ", td[i]->retract);
+        printf("Exit: %d ", td[i]->exit);
+        printf("Line Increment: %d ", td[i]->line_increment);
+        printf("Is Final: %d\n", td[i]->is_final);
+    }
+
+    for(int i=0; i<td[0]->transitions.size; i++) {
+        printf("Symbol: %s, Next State: %d\n", td[0]->transitions.symbol[i], td[0]->transitions.next_state[i]);
+    }
+
     return 0;
 }
