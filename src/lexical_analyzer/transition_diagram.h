@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#define NUM_STATES 64
+#define NUM_STATES 65
 
 typedef struct Transitions Transitions;
 typedef struct State* State;
@@ -73,16 +73,155 @@ State* create_transition_diagram() {
     // Create transitions
     // Using $$ for Other transition
     add_transition(td[0], "<<", 1);
+    add_transition(td[0],"0255",64); //trap state
+    add_transition(td[1],"--",2);
+    add_transition(td[1],"0255",5);
+    add_transition(td[1],"==",6);
+    add_transition(td[2],"--",3);
+    add_transition(td[2],"0255",60);
+    add_transition(td[3],"--",4);
+    add_transition(td[3],"0255",64); //trap state
+
+
     add_transition(td[0], "..", 7);
+
+
     add_transition(td[0], "09", 8);
+    add_transition(td[8],"09",8);
+    add_transition(td[8],"0255",9);
+    add_transition(td[8],"..",11);
+    // add_transition(td[11],"",63); //input nahi padha jaa raha vro //iska trap state agar ho mat bhoolna
+    add_transition(td[11],"09",12);
+    add_transition(td[12],"09",13);
+    add_transition(td[12],"0255",64); //trap state
+    add_transition(td[13],"0255",18);
+    add_transition(td[13],"EE",14);
+    add_transition(td[14],"+-",15);
+    add_transition(td[14],"09",16);
+    add_transition(td[14],"0255",64); //trap state
+    add_transition(td[15],"09",16);
+    add_transition(td[16],"09",17);
+    add_transition(td[16],"0255",64); //trap state
+
+
+
     add_transition(td[0], "--", 10);
+
+
+
     add_transition(td[0], "__", 19);
+    add_transition(td[19],"0255",64); //trap state
+    add_transition(td[19],"aZ",20); //LOWER+UPPER=LETTER
+    add_transition(td[20],"aZ",20);
+    add_transition(td[20],"09",21);
+    add_transition(td[20],"0255",22);
+    add_transition(td[21],"0255",22);
+    add_transition(td[21],"09",21);
+
+
     add_transition(td[0], "@@", 23);
+    add_transition(td[23],"0255",64); //trap state
+    add_transition(td[23],"@@",24);
+    add_transition(td[24],"@@",25);
+    add_transition(td[24],"0255",64); //trap state
+
+
+
     add_transition(td[0], "##", 26);
+    add_transition(td[26],"0255",64); //trap state
+    add_transition(td[26],"az",27); //az=Lower
+    add_transition(td[27],"az",27);
+    add_transition(td[27],"0255",28);
+
+
     add_transition(td[0], "**", 56);
+
+
+
     add_transition(td[0], "[[", 59);
+
+
+
     add_transition(td[0], "&&", 29);
+    add_transition(td[29],"0255",64); //trap state
+    add_transition(td[29],"&&",30);
+    add_transition(td[30],"0255",64); //trap state
+    add_transition(td[30],"&&",31);
+
+
     add_transition(td[0], "]]", 58);
+
+
+    add_transition(td[0],",,",53); //check if comma or apostrophe
+
+    add_transition(td[0],"//",32);
+
+    add_transition(td[0],"%%",33);
+    add_transition(td[33],"0255",33); //check this once
+    add_transition(td[33],"\\n",34); //only new line char
+
+    add_transition(td[0],"))",37);
+
+    add_transition(td[0],"blank\\t",35);
+    add_transition(td[35],"blank\\t",35);
+    add_transition(td[35],"0255",36);
+
+
+    add_transition(td[0],"((",38);
+
+
+    add_transition(td[0],"bd",39); //bd=BTOD
+    add_transition(td[39],"0255",44);
+    add_transition(td[39],"az",43); //LOWER
+    add_transition(td[39],"27",40); //TTOS
+    add_transition(td[40],"bd",40);
+    add_transition(td[40],"0255",42);
+    add_transition(td[40],"27",41);
+    add_transition(td[41],"27",42);
+    add_transition(td[41],"0255",42);
+
+    add_transition(td[0],"\\n",61); //only new line char
+
+    add_transition(td[0],"aez",43); //NBTOD
+    add_transition(td[43],"az",43);
+    add_transition(td[43],"0255",44);
+
+
+    add_transition(td[0],"++",45);
+
+
+    add_transition(td[0],"!!",46);
+    add_transition(td[46],"0255",64);
+    add_transition(td[46],"==",47);
+
+
+    add_transition(td[0],"==",48);
+    add_transition(td[48],"0255",64); //trap state
+    add_transition(td[48],"==",49);
+    
+
+
+    add_transition(td[0],">>",50);
+    add_transition(td[50],"0255",51);
+    add_transition(td[50],"==",52);
+
+
+    add_transition(td[0],"::",53);
+
+
+    add_transition(td[0],";;",54);
+
+    add_transition(td[0],"~~",55);
+
+
+    add_transition(td[0],"EOF",62);
+
+
+
+
+
+
+
 
     return td;
 }
