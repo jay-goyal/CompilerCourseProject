@@ -7,7 +7,7 @@
 #define NUM_STATES 64
 
 typedef struct Transitions Transitions_t;
-typedef struct State State_t;
+typedef struct State state_t;
 
 struct Transitions {
     int size;
@@ -23,10 +23,10 @@ struct State {
     bool line_increment;
 };
 
-State_t* create_state(int retract, bool exit, bool line_increment,
+state_t* create_state(int retract, bool exit, bool line_increment,
                       bool is_final);
-void add_transition(State_t* state, char symbol[], int next_state);
-State_t** create_transition_diagram();
-void clear_transition_diagram(State_t** td);
+void add_transition(state_t* state, char symbol[], int next_state);
+state_t** create_transition_diagram();
+void clear_transition_diagram(state_t** td);
 
 #endif

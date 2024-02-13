@@ -3,19 +3,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-node_t* make_node(char** key, int val) {
+node_t* make_node(char* key) {
     node_t* temp = (node_t*)malloc(sizeof(node_t));
     if (temp == NULL) {
         printf("Mem Alloc failed");
     }
     temp->key = key;
-    temp->val = val;
     temp->next = NULL;
     return temp;
 }
 
-void insert_tail_node(node_t* head, char** key, int val) {
-    node_t* tail = make_node(key, val);
+void insert_tail_node(node_t* head, char* key) {
+    node_t* tail = make_node(key);
 
     if (head == NULL) {
         head = tail;

@@ -10,10 +10,10 @@ typedef struct HashTable {
     node_t** entries;
 } ht_t;
 
-unsigned int hash(char** key);
+unsigned int hash(char* key);
 ht_t* create_hash_table();
-void insert_key_val(ht_t* hashtable, char** key, int val);
+void insert_entry(ht_t* hashtable, char* key);
 void free_hashtable(ht_t* hashtable);
-int search_key(ht_t* hashtable, char** key);
+node_t* check_node_exists(ht_t* hashtable, char* key);
 
 #endif  // !HASH_TABLE_H

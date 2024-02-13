@@ -1,8 +1,8 @@
 #include "transition_diagram.h"
 
-State_t* create_state(int retract, bool exit, bool line_increment,
+state_t* create_state(int retract, bool exit, bool line_increment,
                       bool is_final) {
-    State_t* state = (State_t*)malloc(sizeof(struct State));
+    state_t* state = (state_t*)malloc(sizeof(struct State));
     state->transitions.size = 0;
     state->retract = retract;
     state->exit = exit;
@@ -11,7 +11,7 @@ State_t* create_state(int retract, bool exit, bool line_increment,
     return state;
 }
 
-void add_transition(State_t* state, char symbol[], int next_state) {
+void add_transition(state_t* state, char symbol[], int next_state) {
     state->transitions.symbol =
         (char**)realloc(state->transitions.symbol,
                         (state->transitions.size + 1) * sizeof(char*));
@@ -26,9 +26,9 @@ void add_transition(State_t* state, char symbol[], int next_state) {
     state->transitions.next_state[state->transitions.size - 1] = next_state;
 }
 
-State_t** create_transition_diagram() {
+state_t** create_transition_diagram() {
     // Create states
-    State_t** td = (State_t**)malloc(NUM_STATES * sizeof(State_t*));
+    state_t** td = (state_t**)malloc(NUM_STATES * sizeof(state_t*));
     for (int i = 0; i < NUM_STATES; i++) {
         int retract = 0;
         bool exit = false, line_increment = false, is_final = false;
@@ -79,9 +79,9 @@ State_t** create_transition_diagram() {
     return td;
 }
 
-void clear_transition_diagram(State_t** td) {
+void clear_transition_diagram(state_t** td) {
     for (int i = 0; i < NUM_STATES; i++) {
-        State_t* state = td[i];
+        state_t* state = td[i];
         int size = state->transitions.size;
         if (size > 0) {
             for (int j = 0; j < size; j++) {
