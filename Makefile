@@ -18,6 +18,8 @@ DBGDIRS := $(subst src,$(DBGDIR),$(dir $(SOURCES)))
 run: target
 	./$(TGTDIR)/compiler
 
+build: target
+
 target: $(TGTDIRS) $(SOURCES) $(HEADERS) $(TGTOBJ)
 	$(CC) -o $(TGTDIR)/compiler $(TGTOBJ)
 
