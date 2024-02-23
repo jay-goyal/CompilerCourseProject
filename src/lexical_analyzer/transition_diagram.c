@@ -50,7 +50,9 @@ state_t** create_transition_diagram() {
         td[final_states[i]]->is_final = true;
     }
 
-    // Create transitions
+    // TODO: Return Values
+
+    // TODO: Create transitions
     add_transition(td[0], "09", 8);
     add_transition(td[0], "az", 43);
 

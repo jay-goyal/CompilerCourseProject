@@ -18,6 +18,7 @@ struct Transitions {
 struct State {
     Transitions_t transitions;
     int retract;
+    int token;
     bool exit;
     bool is_final;
     bool line_increment;

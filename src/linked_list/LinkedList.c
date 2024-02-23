@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-node_t* make_node(char* key) {
+node_t* make_node(stentry_t* key) {
     node_t* temp = (node_t*)malloc(sizeof(node_t));
     if (temp == NULL) {
         printf("Mem Alloc failed");
@@ -13,7 +13,7 @@ node_t* make_node(char* key) {
     return temp;
 }
 
-void insert_tail_node(node_t* head, char* key) {
+void insert_tail_node(node_t* head, stentry_t* key) {
     node_t* tail = make_node(key);
 
     if (head == NULL) {

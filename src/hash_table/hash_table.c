@@ -5,12 +5,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-node_t* check_node_exists(ht_t* hashtable, char* key) {
-    unsigned int hash_value = hash(key);
+node_t* check_node_exists(ht_t* hashtable, stentry_t* key) {
+    unsigned int hash_value = hash(key->lexeme);
     node_t** entries = hashtable->entries;
     node_t* curr_node = entries[hash_value];
     while (curr_node != NULL) {
-        if (strcmp(curr_node->key, key) == 0) return curr_node;
+        if (strcmp(curr_node->key->lexeme, key->lexeme) == 0) return curr_node;
         curr_node = curr_node->next;
     }
     return NULL;
@@ -39,9 +39,10 @@ ht_t* create_hash_table() {
     return hashtable;
 }
 
-void insert_entry(ht_t* hashtable, char* key) {
-    unsigned int hash_value = hash(key);
-    printf("INSERTING %s at hash %u\n", key, hash_value);
+void insert_entry(ht_t* hashtable, stentry_t* key) {
+    unsigned int hash_value = hash(key->lexeme);
+    printf("INSERTING %s with keyword %u at hash %u\n", key->lexeme,
+           key->token_type, hash_value);
     node_t** entries = hashtable->entries;
     node_t* node = check_node_exists(hashtable, key);
     if (entries[hash_value] == NULL) {
