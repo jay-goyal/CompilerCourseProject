@@ -31,7 +31,7 @@ ht_t* create_hash_table() {
     ht_t* hashtable = (ht_t*)malloc(sizeof(ht_t) * 1);
     if (hashtable == NULL) {
         printf("Cannot allocate the Hash Table");
-        return NULL;
+        exit(-1);
     }
 
     hashtable->entries = (node_t**)calloc(TABLE_SIZE, sizeof(node_t*));
@@ -41,8 +41,6 @@ ht_t* create_hash_table() {
 
 stentry_t* insert_entry(ht_t* hashtable, stentry_t* key) {
     unsigned int hash_value = hash(key->lexeme);
-    printf("INSERTING %s with keyword %u at hash %u\n", key->lexeme,
-           key->token_type, hash_value);
     node_t** entries = hashtable->entries;
     node_t* node = check_node_exists(hashtable, key);
     if (node != NULL) {

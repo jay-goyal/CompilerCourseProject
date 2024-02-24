@@ -53,6 +53,8 @@ void delete_list(node_t* head) {
     node_t* temp = head;
     while (temp != NULL) {
         node_t* next = temp->next;
+        free(temp->key->lexeme);
+        free(temp->key);
         free(temp);
         temp = next;
     }
