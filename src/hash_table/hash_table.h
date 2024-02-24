@@ -13,7 +13,7 @@ typedef struct HashTable {
 
 unsigned int hash(char* key);
 ht_t* create_hash_table();
-void insert_entry(ht_t* hashtable, stentry_t* key);
+stentry_t* insert_entry(ht_t* hashtable, stentry_t* key);
 void free_hashtable(ht_t* hashtable);
 node_t* check_node_exists(ht_t* hashtable, stentry_t* key);
 

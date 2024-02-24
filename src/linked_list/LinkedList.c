@@ -13,18 +13,19 @@ node_t* make_node(stentry_t* key) {
     return temp;
 }
 
-void insert_tail_node(node_t* head, stentry_t* key) {
+node_t* insert_tail_node(node_t* head, stentry_t* key) {
     node_t* tail = make_node(key);
 
     if (head == NULL) {
         head = tail;
-        return;
+        return tail;
     }
     node_t* temp = head;
     while (temp->next != NULL) {
         temp = temp->next;
     }
     temp->next = tail;
+    return tail;
 }
 
 void delete_tail_node(node_t* head) {

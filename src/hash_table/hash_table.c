@@ -39,21 +39,22 @@ ht_t* create_hash_table() {
     return hashtable;
 }
 
-void insert_entry(ht_t* hashtable, stentry_t* key) {
+stentry_t* insert_entry(ht_t* hashtable, stentry_t* key) {
     unsigned int hash_value = hash(key->lexeme);
     printf("INSERTING %s with keyword %u at hash %u\n", key->lexeme,
            key->token_type, hash_value);
     node_t** entries = hashtable->entries;
     node_t* node = check_node_exists(hashtable, key);
-    if (entries[hash_value] == NULL) {
-        node_t* node = make_node(key);
-        entries[hash_value] = node;
-        return;
-    }
     if (node != NULL) {
-        return;
+        return node->key;
     }
-    insert_tail_node(entries[hash_value], key);
+    if (entries[hash_value] == NULL) {
+        node = make_node(key);
+        entries[hash_value] = node;
+        return NULL;
+    }
+    node = insert_tail_node(entries[hash_value], key);
+    return NULL;
 }
 
 void free_hashtable(ht_t* hashtable) {

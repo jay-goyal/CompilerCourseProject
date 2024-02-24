@@ -9,7 +9,7 @@ typedef struct Node {
 } node_t;
 
 node_t* make_node(stentry_t* key);
-void insert_tail_node(node_t* head, stentry_t* key);
+node_t* insert_tail_node(node_t* head, stentry_t* key);
 void delete_tail_node(node_t* head);
 void delete_list(node_t* head);
 
