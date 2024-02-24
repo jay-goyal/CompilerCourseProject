@@ -1,5 +1,7 @@
 #include "transition_diagram.h"
 
+#include "lexer_types.h"
+
 state_t* create_state(int retract, bool exit, bool line_increment,
                       bool is_final) {
     state_t* state = (state_t*)malloc(sizeof(struct State));
@@ -51,10 +53,18 @@ state_t** create_transition_diagram() {
     }
 
     // TODO: Return Values
+    td[36]->token = -1;
+    td[9]->token = TK_NUM;
+    td[63]->token = TK_NUM;
+    td[18]->token = TK_RNUM;
+    td[17]->token = TK_RNUM;
 
     // TODO: Create transitions
     add_transition(td[0], "09", 8);
     add_transition(td[0], "az", 43);
+    add_transition(td[0], "  ", 35);
+    add_transition(td[0], "  ", 35);
+    add_transition(td[0], "\n\n", 61);
 
     add_transition(td[43], "az", 43);
     add_transition(td[43], "\0\x7f", 44);
@@ -78,7 +88,27 @@ state_t** create_transition_diagram() {
     add_transition(td[15], "09", 16);
 
     add_transition(td[16], "09", 17);
+
+    add_transition(td[35], "  ", 35);
+    add_transition(td[35], "  ", 35);
+    add_transition(td[35], "\0\x7f", 36);
+
     return td;
+}
+
+int get_next_state(int curr_state, char symbol, state_t** td) {
+    state_t* state = td[curr_state];
+    transitions_t transitions = state->transitions;
+    int num_tr = transitions.size;
+
+    for (int i = 0; i < num_tr; i++) {
+        char* transition = transitions.symbol[i];
+        if (symbol >= transition[0] && symbol <= transition[1]) {
+            return transitions.next_state[i];
+        }
+    }
+
+    return -1;
 }
 
 void clear_transition_diagram(state_t** td) {

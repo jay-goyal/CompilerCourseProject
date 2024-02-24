@@ -23,7 +23,7 @@ build: target
 target: $(TGTDIRS) $(SOURCES) $(HEADERS) $(TGTOBJ)
 	$(CC) -o $(TGTDIR)/compiler $(TGTOBJ)
 
-debug: $(DBGDIRS) $(SOURCES) $(DBGOBJ)
+debug: $(DBGDIRS) $(SOURCES) $(HEADERS) $(DBGOBJ)
 	$(CC) -o $(DBGDIR)/compiler $(DBGOBJ)
 
 clean:
