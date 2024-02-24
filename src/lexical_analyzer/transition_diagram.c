@@ -1,5 +1,4 @@
 #include "transition_diagram.h"
-
 #include "lexer_types.h"
 
 state_t* create_state(int retract, bool exit, bool line_increment,
@@ -52,27 +51,86 @@ state_t** create_transition_diagram() {
         td[final_states[i]]->is_final = true;
     }
 
-    // TODO: Return Values
-    td[36]->token = -1;
+    // Return Values
+    td[4]->token = TK_ASSIGNOP;
+    td[5]->token = TK_LT;
+    td[6]->token = TK_LE;
+    td[7]->token = TK_DOT;
     td[9]->token = TK_NUM;
-    td[63]->token = TK_NUM;
-    td[18]->token = TK_RNUM;
+    td[10]->token = TK_MINUS;
     td[17]->token = TK_RNUM;
+    td[18]->token = TK_RNUM;
+    td[22]->token = TK_FUNID;
+    td[25]->token = TK_OR;
+    td[28]->token = TK_RUID;
+    td[31]->token = TK_AND;
+    td[32]->token = TK_DIV;
+    td[34]->token = TK_COMMENT;
+    td[36]->token = -1;
+    td[37]->token = TK_CL;
+    td[38]->token = TK_OP;
+    td[42]->token = TK_ID;
+    td[44]->token = TK_FIELDID;
+    td[45]->token = TK_PLUS;
+    td[47]->token = TK_NE;
+    td[49]->token = TK_EQ;
+    td[51]->token = TK_GT;
+    td[52]->token = TK_GE;
+    td[53]->token = TK_COLON;
+    td[54]->token = TK_SEM;
+    td[55]->token = TK_NOT;
+    td[56]->token = TK_MUL;
+    td[57]->token = TK_COMMA;
+    td[58]->token = TK_SQR;
+    td[59]->token = TK_SQL;
+    td[60]->token = TK_LT;
+    td[61]->token = -1;
+    td[62]->token = -1;
+    td[63]->token = TK_NUM;
 
-    // TODO: Create transitions
+    // Create transitions
+    add_transition(td[0], "<<", 1);
+    add_transition(td[0], "..", 7);
     add_transition(td[0], "09", 8);
-    add_transition(td[0], "az", 43);
+    add_transition(td[0], "--", 10);
+    add_transition(td[0], "__", 19);
+    add_transition(td[0], "@@", 23);
+    add_transition(td[0], "##", 26);
+    add_transition(td[0], "**", 56);
+    add_transition(td[0], "[[", 59);
+    add_transition(td[0], "&&", 29);
+    add_transition(td[0], "]]", 58);
+    add_transition(td[0], ",,", 57);
+    add_transition(td[0], "//", 32);
+    add_transition(td[0], "%%", 33);
+    add_transition(td[0], "))", 37);
     add_transition(td[0], "  ", 35);
-    add_transition(td[0], "  ", 35);
+    add_transition(td[0], "\t\t", 35);
+    add_transition(td[0], "((", 38);
+    add_transition(td[0], "bd", 39);
     add_transition(td[0], "\n\n", 61);
+    add_transition(td[0], "az", 43);
+    add_transition(td[0], "++", 45);
+    add_transition(td[0], "!!", 46);
+    add_transition(td[0], "==", 48);
+    add_transition(td[0], ">>", 50);
+    add_transition(td[0], "::", 53);
+    add_transition(td[0], ";;", 54);
+    add_transition(td[0], "~~", 55);
 
-    add_transition(td[43], "az", 43);
-    add_transition(td[43], "\0\x7f", 44);
+    add_transition(td[1], "--", 2);
+    add_transition(td[1], "==", 6);
+    add_transition(td[1], "\0\x7f", 5);
 
+    add_transition(td[2], "--", 3);
+    add_transition(td[2], "\0\x7f", 60);
+
+    add_transition(td[3], "--", 4);
+    
     add_transition(td[8], "09", 8);
     add_transition(td[8], "..", 11);
     add_transition(td[8], "\0\x7f", 9);
-
+    
     add_transition(td[11], "09", 12);
     add_transition(td[11], "\0\x7f", 63);
 
@@ -88,10 +146,56 @@ state_t** create_transition_diagram() {
     add_transition(td[15], "09", 16);
 
     add_transition(td[16], "09", 17);
+    
+    add_transition(td[19], "az", 20);
+    add_transition(td[19], "AZ", 20);
+    
+    add_transition(td[20], "az", 20);
+    add_transition(td[20], "AZ", 20);
+    add_transition(td[20], "09", 21);
+    add_transition(td[20], "\0\x7f", 22);
+
+    add_transition(td[21], "09", 21);
+    add_transition(td[21], "\0\x7f", 22);
+    
+    add_transition(td[23], "@@", 24);
+    
+    add_transition(td[24], "@@", 25);
+    
+    add_transition(td[26], "az", 27);
+    
+    add_transition(td[27], "az", 27);
+    add_transition(td[27], "\0\x7f", 28);
+
+    add_transition(td[29], "&&", 30);
+
+    add_transition(td[30], "&&", 31);
+
+    add_transition(td[33], "\n\n", 34);
 
     add_transition(td[35], "  ", 35);
-    add_transition(td[35], "  ", 35);
+    add_transition(td[35], "\t\t", 35);
     add_transition(td[35], "\0\x7f", 36);
+
+    add_transition(td[39], "27", 40);
+    add_transition(td[39], "az", 43);
+    add_transition(td[39], "\0\x7f", 44);
+
+    add_transition(td[40], "27", 41);
+    add_transition(td[40], "\0\x7f", 42);
+
+    add_transition(td[41], "27", 41);
+    add_transition(td[41], "\0\x7f", 42);
+
+    add_transition(td[43], "az", 43);
+    add_transition(td[43], "\0\x7f", 44);
+    
+    add_transition(td[46], "==", 47);
+    
+    add_transition(td[48], "==", 49);
+    
+    add_transition(td[50], "==", 52);
+    add_transition(td[50], "\0\x7f", 51);
 
     return td;
 }
