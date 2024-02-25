@@ -127,6 +127,7 @@ start_parsing:
                     free(entry);
                     entry = existing_entry;
                 }
+                ret_token.token_type = entry->token_type;
                 ret_token.info.stentry = entry;
                 break;
             }
