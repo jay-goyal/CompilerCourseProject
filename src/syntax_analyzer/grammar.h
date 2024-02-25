@@ -32,7 +32,7 @@
 #define CONSTRUCTEDVARIABLE 83
 #define ONEEXPANSION 84
 #define MOREEXPANSIONS 85
-#define FUNCALLSTMT 86
+#define FUNCALLSTMT 86  //29
 #define OUTPUTPARAMETERS 87
 #define INPUTPARAMETERS 88
 #define ITERATIVESTMT 89
@@ -44,7 +44,7 @@
 #define TERM 95
 #define TERMPRIME 96
 #define FACTOR 97
-#define HIGHPRECEDENCEOPERATOR 98
+#define HIGHPRECEDENCEOPERATORS 98
 #define LOWPRECEDENCEOPERATORS 99
 #define OPERATOR 100
 #define BOOLEANEXPRESSION 101
@@ -73,8 +73,16 @@ typedef struct Grammar {
     nt_t **nonterminals;
 } gram_t;
 
+typedef struct FirstSet {
+    int term[58];
+} first_t;
+
 gram_t *create_grammar();
-// nt_t *add_nonterminal(int nt, prod_t *prod);
-// prod_t *add_production(int *right);
+nt_t* add_nonterminal(gram_t* gram, int nt);
+prod_t* create_production();
+void add_production(nt_t* nonterm, prod_t* prod);
+void add_right(prod_t* prod, int right);
+void populate_productions(gram_t* gram);
+first_t* compute_first(gram_t* gram, nt_t* nonterm);
 
 #endif

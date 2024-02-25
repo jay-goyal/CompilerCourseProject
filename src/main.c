@@ -211,15 +211,15 @@ int main(int argc, char* argv[]) {
     populate_symbol_table(symbol_table);
 
     gram_t* gram = create_grammar();
-    for(int i=0; i<3; i++) {
-        for(int j=0; j<gram->nonterminals[i]->num_prod; j++) {
-            printf("%d ->", i);
-            for(int k=0; k<gram->nonterminals[i]->productions[j]->num_right; k++) {
-                printf(" %d", gram->nonterminals[i]->productions[j]->right[k]);
-            }
-            printf("\n");
-        }
-    }
+    // for(int i=0; i<3; i++) {
+    //     for(int j=0; j<gram->nonterminals[i]->num_prod; j++) {
+    //         printf("%d ->", i);
+    //         for(int k=0; k<gram->nonterminals[i]->productions[j]->num_right; k++) {
+    //             printf(" %d", gram->nonterminals[i]->productions[j]->right[k]);
+    //         }
+    //         printf("\n");
+    //     }
+    // }
 
     tokeninfo_t ret_token = get_next_token("test.txt", symbol_table);
     while (ret_token.token_type != -2) {
