@@ -1,6 +1,7 @@
 #ifndef COMPILER_TYPES_H
 #define COMPILER_TYPES_H
 
+#define EPSILON -1
 #define TK_ASSIGNOP 0
 #define TK_COMMENT 1
 #define TK_FIELDID 2

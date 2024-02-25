@@ -4,6 +4,7 @@
 #include "hash_table/hash_table.h"
 #include "lexical_analyzer/lexer.h"
 #include "lexical_analyzer/lexer_types.h"
+#include "syntax_analyzer/grammar.h"
 
 void populate_symbol_table(ht_t* st) {
     stentry_t* entry = (stentry_t*)calloc(1, sizeof(stentry_t));
@@ -208,6 +209,17 @@ int main(int argc, char* argv[]) {
 
     ht_t* symbol_table = create_hash_table();
     populate_symbol_table(symbol_table);
+
+    gram_t* gram = create_grammar();
+    for(int i=0; i<3; i++) {
+        for(int j=0; j<gram->nonterminals[i]->num_prod; j++) {
+            printf("%d ->", i);
+            for(int k=0; k<gram->nonterminals[i]->productions[j]->num_right; k++) {
+                printf(" %d", gram->nonterminals[i]->productions[j]->right[k]);
+            }
+            printf("\n");
+        }
+    }
 
     tokeninfo_t ret_token = get_next_token("test.txt", symbol_table);
     while (ret_token.token_type != -2) {
