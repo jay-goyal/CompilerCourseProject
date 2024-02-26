@@ -87,6 +87,7 @@ prod_t *create_production();
 void add_production(nt_t *nonterm, prod_t *prod);
 void add_right(prod_t *prod, int right);
 void populate_productions(gram_t *gram);
-first_t *compute_first(gram_t *gram, nt_t *nonterm);
+void compute_first(first_t** first_sets, gram_t *gram, nt_t *nonterm, int nt_index);
+first_t **compute_first_sets(gram_t *gram);
 
 #endif

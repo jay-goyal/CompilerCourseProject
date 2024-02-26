@@ -245,6 +245,8 @@ int main(int argc, char* argv[]) {
         }
         ret_token = get_next_token("test.txt", symbol_table);
     }
+    
+    first_t** first_sets = compute_first_sets(gram);
 
     return 0;
 }
