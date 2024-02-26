@@ -4,37 +4,39 @@
 
 #define NUM_TERMINALS 57
 
-bool visited[55] = {0};
+bool visited[54] = {0};
 
 gram_t *create_grammar()
 {
     gram_t *gram = (gram_t *)malloc(sizeof(gram_t));
-    gram->nonterminals = (nt_t **)calloc(55, sizeof(nt_t *));
+    gram->nonterminals = (nt_t **)calloc(54, sizeof(nt_t *));
     populate_productions(gram);
-    // first_t *f = compute_first(gram, gram->nonterminals[22]);
-    // for (int i = 0; i < 58; i++)
-    // {
-    //     if (f->term[i] == 1)
-    //     {
-    //         if (i == 0)
-    //             printf("EPSILON\n");
-    //         else
-    //             printf("%s\n", token_str[i - 1]);
-    //     }
-    // }
     first_t **first_sets = compute_first_sets(gram);
     return gram;
 }
 
-// Todo: Clear Grammar
+void clear_grammar(gram_t *gram)
+{
+    for (int i=0; i<54; i++) {
+        for(int j=0; j<gram->nonterminals[i]->num_prod; j++) {
+            free(gram->nonterminals[i]->productions[j]->right);
+            free(gram->nonterminals[i]->productions[j]);
+        }
+        free(gram->nonterminals[i]->productions);
+        free(gram->nonterminals[i]);
+    }
+    free(gram->nonterminals);
+    free(gram);
+}
 
 first_t **compute_first_sets(gram_t *gram)
 {
-    first_t **first_sets = (first_t **)malloc(55 * sizeof(first_t *));
-    for (int i = 0; i < 55; i++) {
+    first_t **first_sets = (first_t **)malloc(54 * sizeof(first_t *));
+    for (int i = 0; i < 54; i++) {
         first_sets[i] = (first_t *)malloc(sizeof(first_t));
     }
-    for(int i=0; i<55; i++) {
+    
+    for(int i=0; i<54; i++) {
         printf("%d: ",i);
         compute_first(first_sets, gram, gram->nonterminals[i], i);
         for (int j = 0; j < 58; j++)
@@ -59,8 +61,6 @@ void compute_first(first_t ** first_sets, gram_t *gram, nt_t *nonterm, int nt_in
     }
 
     visited[nt_index] = true;
-    // printf("%d\n", nt_index);
-    // first_t *first = first_sets[nt_index];
     int num_prod = nonterm->num_prod;
     for (int i = 0; i < num_prod; i++)
     {
@@ -89,8 +89,6 @@ void compute_first(first_t ** first_sets, gram_t *gram, nt_t *nonterm, int nt_in
             }
         }
     }
-
-    // first_sets[nt_index] =  first;
 }
 
 nt_t *add_nonterminal(gram_t *gram, int nt)
@@ -564,15 +562,11 @@ void populate_productions(gram_t *gram)
     add_right(prod, BOOLEANEXPRESSION);
     add_right(prod, TK_CL);
     add_production(nonterm, prod);
-
-    nonterm = add_nonterminal(gram, BOOLEANEXPRESSION);
     prod = create_production();
     add_right(prod, VAR);
     add_right(prod, RELATIONALOP);
     add_right(prod, VAR);
     add_production(nonterm, prod);
-
-    nonterm = add_nonterminal(gram, BOOLEANEXPRESSION);
     prod = create_production();
     add_right(prod, TK_NOT);
     add_right(prod, TK_OP);

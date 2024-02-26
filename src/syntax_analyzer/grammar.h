@@ -32,7 +32,7 @@
 #define CONSTRUCTEDVARIABLE 83
 #define ONEEXPANSION 84
 #define MOREEXPANSIONS 85
-#define FUNCALLSTMT 86 // 29
+#define FUNCALLSTMT 86
 #define OUTPUTPARAMETERS 87
 #define INPUTPARAMETERS 88
 #define ITERATIVESTMT 89
@@ -46,18 +46,17 @@
 #define FACTOR 97
 #define HIGHPRECEDENCEOPERATORS 98
 #define LOWPRECEDENCEOPERATORS 99
-#define BOOLEANEXPRESSION 100
+#define BOOLEANEXPRESSION 100   // 43
 #define VAR 101
-#define BOOLEANEXPRESSION 102
-#define LOGICALOP 103
-#define RELATIONALOP 104
-#define RETURNSTMT 105
-#define OPTIONALRETURN 106
-#define IDLIST 107
-#define MORE_IDS 108
-#define DEFINETYPESTMT 109
-#define A 110
-#define OPTIONSINGLECONSTRUCTED 111
+#define LOGICALOP 102
+#define RELATIONALOP 103
+#define RETURNSTMT 104
+#define OPTIONALRETURN 105
+#define IDLIST 106
+#define MORE_IDS 107
+#define DEFINETYPESTMT 108
+#define A 109
+#define OPTIONSINGLECONSTRUCTED 110
 
 typedef struct Production
 {
@@ -87,6 +86,7 @@ prod_t *create_production();
 void add_production(nt_t *nonterm, prod_t *prod);
 void add_right(prod_t *prod, int right);
 void populate_productions(gram_t *gram);
+void clear_grammar(gram_t *gram);
 void compute_first(first_t** first_sets, gram_t *gram, nt_t *nonterm, int nt_index);
 first_t **compute_first_sets(gram_t *gram);
 
