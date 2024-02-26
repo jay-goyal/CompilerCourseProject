@@ -56,7 +56,7 @@
 #define MORE_IDS 107
 #define DEFINETYPESTMT 108
 #define A 109
-#define OPTIONSINGLECONSTRUCTED 110
+#define OPTION_SINGLE_CONSTRUCTED 110
 
 typedef struct Production
 {

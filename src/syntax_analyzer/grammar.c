@@ -17,8 +17,10 @@ gram_t *create_grammar()
 
 void clear_grammar(gram_t *gram)
 {
-    for (int i=0; i<54; i++) {
-        for(int j=0; j<gram->nonterminals[i]->num_prod; j++) {
+    for (int i = 0; i < 54; i++)
+    {
+        for (int j = 0; j < gram->nonterminals[i]->num_prod; j++)
+        {
             free(gram->nonterminals[i]->productions[j]->right);
             free(gram->nonterminals[i]->productions[j]);
         }
@@ -32,12 +34,14 @@ void clear_grammar(gram_t *gram)
 first_t **compute_first_sets(gram_t *gram)
 {
     first_t **first_sets = (first_t **)malloc(54 * sizeof(first_t *));
-    for (int i = 0; i < 54; i++) {
+    for (int i = 0; i < 54; i++)
+    {
         first_sets[i] = (first_t *)malloc(sizeof(first_t));
     }
-    
-    for(int i=0; i<54; i++) {
-        printf("%d: ",i);
+
+    for (int i = 0; i < 54; i++)
+    {
+        printf("%d: ", i);
         compute_first(first_sets, gram, gram->nonterminals[i], i);
         for (int j = 0; j < 58; j++)
         {
@@ -54,9 +58,10 @@ first_t **compute_first_sets(gram_t *gram)
     return first_sets;
 }
 
-void compute_first(first_t ** first_sets, gram_t *gram, nt_t *nonterm, int nt_index)
+void compute_first(first_t **first_sets, gram_t *gram, nt_t *nonterm, int nt_index)
 {
-    if(visited[nt_index]) {
+    if (visited[nt_index])
+    {
         return;
     }
 
@@ -86,6 +91,10 @@ void compute_first(first_t ** first_sets, gram_t *gram, nt_t *nonterm, int nt_in
                 {
                     break;
                 }
+                else
+                {
+                    first_sets[nt_index]->term[0] = 0;
+                }
             }
         }
     }
@@ -95,7 +104,6 @@ nt_t *add_nonterminal(gram_t *gram, int nt)
 {
     gram->nonterminals[nt - NUM_TERMINALS] = (nt_t *)malloc(sizeof(nt_t));
     gram->nonterminals[nt - NUM_TERMINALS]->num_prod = 0;
-    gram->nonterminals[nt - NUM_TERMINALS]->productions = (prod_t **)malloc(sizeof(prod_t *));
     return gram->nonterminals[nt - NUM_TERMINALS];
 }
 
@@ -254,8 +262,6 @@ void populate_productions(gram_t *gram)
     add_right(prod, FIELDDEFINITIONS);
     add_right(prod, TK_ENDRECORD);
     add_production(nonterm, prod);
-
-    nonterm = add_nonterminal(gram, TYPEDEFINITION);
     prod = create_production();
     add_right(prod, TK_UNION);
     add_right(prod, TK_RUID);
@@ -284,7 +290,7 @@ void populate_productions(gram_t *gram)
     add_right(prod, PRIMITIVEDATATYPE);
     add_production(nonterm, prod);
     prod = create_production();
-    add_right(prod, TK_RUID);
+    add_right(prod, CONSTRUCTEDDATATYPE);
     add_production(nonterm, prod);
 
     nonterm = add_nonterminal(gram, MOREFIELDS);
@@ -391,10 +397,10 @@ void populate_productions(gram_t *gram)
     nonterm = add_nonterminal(gram, SINGLEORRECID);
     prod = create_production();
     add_right(prod, TK_ID);
-    add_right(prod, OPTIONSINGLECONSTRUCTED);
+    add_right(prod, OPTION_SINGLE_CONSTRUCTED);
     add_production(nonterm, prod);
 
-    nonterm = add_nonterminal(gram, OPTIONSINGLECONSTRUCTED);
+    nonterm = add_nonterminal(gram, OPTION_SINGLE_CONSTRUCTED);
     prod = create_production();
     add_right(prod, ONEEXPANSION);
     add_right(prod, MOREEXPANSIONS);
