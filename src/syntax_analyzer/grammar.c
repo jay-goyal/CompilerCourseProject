@@ -108,12 +108,12 @@ set_t **compute_follow_sets(gram_t *gram, set_t **first_sets) {
 
     for(int i=0; i<NUM_NONTERMINALS; i++) {
         printf("Follow set for %d: ", i);
-        for(int j=0; j<=NUM_TERMINALS; j++) {
+        for(int j=0; j<=NUM_TERMINALS+1; j++) {
             if(follow_sets[i]->term[j] == 1) {
                 if(j == 0) {
                     printf("EPSILON ");
                 }
-                else if(j == NUM_TERMINALS) {
+                else if(j == NUM_TERMINALS+1) {
                     printf("$ ");
                 }
                 else {
@@ -136,7 +136,7 @@ void compute_follow(set_t ** follow_sets, set_t **first_sets, gram_t *gram, nt_t
     int num_prod = nonterm->num_prod;
     if(nt_index == 0) {
         // bottom marker
-        follow_sets[nt_index]->term[NUM_TERMINALS] = 1;
+        follow_sets[nt_index]->term[NUM_TERMINALS+1] = 1;
     }
 
     for(int i=0; i<NUM_NONTERMINALS; i++) {
@@ -157,7 +157,7 @@ void compute_follow(set_t ** follow_sets, set_t **first_sets, gram_t *gram, nt_t
                         } 
                         else {
                             set_t *firstN = first_sets[gram->nonterminals[i]->productions[j]->right[k] - NUM_TERMINALS];
-                            for(int l=0; l<NUM_TERMINALS; l++) {
+                            for(int l=0; l<=NUM_TERMINALS+1; l++) {
                                 if(firstN->term[l] == 1) {
                                     follow_sets[nt_index]->term[l] = 1;
                                 }
@@ -179,7 +179,7 @@ void compute_follow(set_t ** follow_sets, set_t **first_sets, gram_t *gram, nt_t
                 if(gram->nonterminals[i]->productions[j]->right[num_right-1] == nt_index + NUM_TERMINALS) {
                     follow_sets[nt_index]->term[0] = 0;
                     compute_follow(follow_sets, first_sets, gram, gram->nonterminals[i], i);
-                    for(int l=0; l<=NUM_TERMINALS; l++) {
+                    for(int l=0; l<=NUM_TERMINALS+1; l++) {
                         if(follow_sets[i]->term[l] == 1) {
                             follow_sets[nt_index]->term[l] = 1;
                         }
@@ -190,7 +190,7 @@ void compute_follow(set_t ** follow_sets, set_t **first_sets, gram_t *gram, nt_t
             if(follow_sets[nt_index]->term[0] == 1) {
                 follow_sets[nt_index]->term[0] = 0;
                 compute_follow(follow_sets, first_sets, gram, gram->nonterminals[i], i);
-                for(int l=0; l<=NUM_TERMINALS; l++) {
+                for(int l=0; l<=NUM_TERMINALS+1; l++) {
                     if(follow_sets[i]->term[l] == 1) {
                         follow_sets[nt_index]->term[l] = 1;
                     }
@@ -345,7 +345,6 @@ void populate_productions(gram_t *gram)
     nonterm = add_nonterminal(gram, TYPEDEFINITIONS);
     prod = create_production();
     add_right(prod, ACTUALORREDEFINED, TYPEDEFINITIONS);
-    add_right(prod, TK_SEM, TYPEDEFINITIONS);
     add_right(prod, TYPEDEFINITIONS, TYPEDEFINITIONS);
     add_production(nonterm, prod);
     prod = create_production();
@@ -476,6 +475,10 @@ void populate_productions(gram_t *gram)
     prod = create_production();
     add_right(prod, CONSTRUCTEDVARIABLE, SINGLEORRECID);
     add_production(nonterm, prod);
+    prod = create_production();
+    add_right(prod, TK_ID, SINGLEORRECID);
+    add_right(prod, OPTION_SINGLE_CONSTRUCTED, SINGLEORRECID);
+    add_production(nonterm, prod);
 
     nonterm = add_nonterminal(gram, CONSTRUCTEDVARIABLE);
     prod = create_production();
@@ -497,12 +500,6 @@ void populate_productions(gram_t *gram)
     add_production(nonterm, prod);
     prod = create_production();
     add_right(prod, EPSILON, MOREEXPANSIONS);
-    add_production(nonterm, prod);
-
-    nonterm = add_nonterminal(gram, SINGLEORRECID);
-    prod = create_production();
-    add_right(prod, TK_ID, SINGLEORRECID);
-    add_right(prod, OPTION_SINGLE_CONSTRUCTED, SINGLEORRECID);
     add_production(nonterm, prod);
 
     nonterm = add_nonterminal(gram, OPTION_SINGLE_CONSTRUCTED);
