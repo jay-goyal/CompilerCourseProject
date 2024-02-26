@@ -57,6 +57,7 @@
 #define DEFINETYPESTMT 108
 #define A 109
 #define OPTION_SINGLE_CONSTRUCTED 110
+#define BOTTOMMARKER 111
 
 typedef struct Production
 {
@@ -75,19 +76,21 @@ typedef struct Grammar
     nt_t **nonterminals;
 } gram_t;
 
-typedef struct FirstSet
+typedef struct Set
 {
-    int term[58];
-} first_t;
+    int term[59];
+} set_t;
 
 gram_t *create_grammar();
 nt_t *add_nonterminal(gram_t *gram, int nt);
 prod_t *create_production();
 void add_production(nt_t *nonterm, prod_t *prod);
-void add_right(prod_t *prod, int right);
+void add_right(prod_t *prod, int right, int nt);
 void populate_productions(gram_t *gram);
 void clear_grammar(gram_t *gram);
-void compute_first(first_t** first_sets, gram_t *gram, nt_t *nonterm, int nt_index);
-first_t **compute_first_sets(gram_t *gram);
+void compute_first(set_t** first_sets, gram_t *gram, nt_t *nonterm, int nt_index);
+set_t **compute_first_sets(gram_t *gram);
+void compute_follow(set_t **follow_sets, set_t **first_sets, gram_t *gram, nt_t *nonterm, int nt_index);
+set_t **compute_follow_sets(gram_t *gram, set_t **first_sets);
 
 #endif
