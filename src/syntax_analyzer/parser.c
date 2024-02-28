@@ -3,12 +3,16 @@
 pt_t create_parse_table(gram_t *gram, set_t **first_sets, set_t **follow_sets) {
     pt_t pt;
     pt.table = (prod_t ***) calloc(NUM_NONTERMINALS, sizeof(prod_t **));
+    prod_t *synch = create_production();
 
     for(int i=0; i<NUM_NONTERMINALS; i++) {
         // include epsilon and $ in the table
         pt.table[i] = (prod_t **) calloc(NUM_TERMINALS+2, sizeof(prod_t *));
         for(int j=0; j<NUM_TERMINALS+2; j++) {
             pt.table[i][j] = NULL;
+            if(follow_sets[i]->term[j] == 1) {
+                pt.table[i][j] = synch;
+            }
         }
     }
 
@@ -61,9 +65,14 @@ pt_t create_parse_table(gram_t *gram, set_t **first_sets, set_t **follow_sets) {
         for(int j=1; j<=NUM_TERMINALS+1; j++) {
             if(pt.table[i][j] != NULL) {
                 printf("-------------NONTERMINAL %s-------------\n", non_terminals[i]);
-                printf("TERMINAL %s \n", token_str[j-1]);
+                if(j <= NUM_TERMINALS)
+                    printf("TERMINAL %s \n", token_str[j-1]);
+                else
+                    printf("TERMINAL $ \n");
                     int num_right = pt.table[i][j]->num_right;
                     printf("%s -> ", non_terminals[i]);
+                    if(num_right == 0)
+                        printf("SYNCH");
                     for(int l=0; l<num_right; l++) {
                         int right = pt.table[i][j]->right[l];
                         if(right == -1)
