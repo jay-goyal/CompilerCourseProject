@@ -59,6 +59,64 @@
 #define OPTION_SINGLE_CONSTRUCTED 110
 #define BOTTOMMARKER 111
 
+static char *non_terminals[] = {
+    "PROGRAM",
+    "MAINFUNCTION",
+    "OTHERFUNCTIONS",
+    "FUNCTION",
+    "INPUT_PAR",
+    "OUTPUT_PAR",
+    "PARAMETER_LIST",
+    "DATATYPE",
+    "PRIMITIVEDATATYPE",
+    "CONSTRUCTEDDATATYPE",
+    "REMAINING_LIST",
+    "STMTS",
+    "TYPEDEFINITIONS",
+    "ACTUALORREDEFINED",
+    "TYPEDEFINITION",
+    "FIELDDEFINITIONS",
+    "FIELDDEFINITION",
+    "FIELDTYPE",
+    "MOREFIELDS",
+    "DECLARATIONS",
+    "DECLARATION",
+    "GLOBAL_OR_NOT",
+    "OTHERSTMTS",
+    "STMT",
+    "ASSIGNMENTSTMT",
+    "SINGLEORRECID",
+    "CONSTRUCTEDVARIABLE",
+    "ONEEXPANSION",
+    "MOREEXPANSIONS",
+    "FUNCALLSTMT",
+    "OUTPUTPARAMETERS",
+    "INPUTPARAMETERS",
+    "ITERATIVESTMT",
+    "CONDITIONALSTMT",
+    "ELSEPART",
+    "IOSTMT",
+    "ARITHMETICEXPRESSION",
+    "EXPPRIME",
+    "TERM",
+    "TERMPRIME",
+    "FACTOR",
+    "HIGHPRECEDENCEOPERATORS",
+    "LOWPRECEDENCEOPERATORS",
+    "BOOLEANEXPRESSION",
+    "VAR",
+    "LOGICALOP",
+    "RELATIONALOP",
+    "RETURNSTMT",
+    "OPTIONALRETURN",
+    "IDLIST",
+    "MORE_IDS",
+    "DEFINETYPESTMT",
+    "A",
+    "OPTION_SINGLE_CONSTRUCTED",
+    "BOTTOMMARKER",
+};
+
 typedef struct Production
 {
     int num_right;
@@ -88,7 +146,7 @@ void add_production(nt_t *nonterm, prod_t *prod);
 void add_right(prod_t *prod, int right, int nt);
 void populate_productions(gram_t *gram);
 void clear_grammar(gram_t *gram);
-void compute_first(set_t** first_sets, gram_t *gram, nt_t *nonterm, int nt_index);
+void compute_first(set_t **first_sets, gram_t *gram, nt_t *nonterm, int nt_index);
 set_t **compute_first_sets(gram_t *gram);
 void compute_follow(set_t **follow_sets, set_t **first_sets, gram_t *gram, nt_t *nonterm, int nt_index);
 set_t **compute_follow_sets(gram_t *gram, set_t **first_sets);
