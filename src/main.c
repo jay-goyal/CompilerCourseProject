@@ -247,9 +247,9 @@ void print_tree_nodes(tnode_t *node) {
     if (node == NULL)
         return;
 
-    printf("%d ", node->val); // Print the current node's value
+    printf("%d ", node->val); 
 
-    // Recursively print the children nodes
+    
     for (int i = 0; i < node->num_children; i++) {
         print_tree_nodes(node->children[i]);
     }
@@ -258,14 +258,14 @@ void print_tree_nodes(tnode_t *node) {
 void test_tree_functions() {
     printf("Testing tree functions...\n");
 
-    // Test create_tree() and insert_tree()
+    
     printf("Creating tree...\n");
     tree_t *tree = create_tree();
     tnode_t *node1 = create_node(1);
     insert_tree(tree, node1);
     printf("Tree created and root node inserted.\n");
 
-    // Test create_node() and insert_node()
+    
     printf("Creating and inserting child nodes...\n");
     tnode_t *node2 = create_node(3);
     insert_node(node1, node2);
@@ -273,19 +273,19 @@ void test_tree_functions() {
     insert_node(node1, node3);
     printf("Child nodes created and inserted.\n");
 
-    // Add 10 more nodes
+    
     for (int i = 0; i < 10; i++) {
-        tnode_t *new_node = create_node(i + 4); // Values start from 4
-        insert_node(node2, new_node); // Inserting under node2
+        tnode_t *new_node = create_node(i + 4);
+        insert_node(node2, new_node);
     }
     printf("10 more nodes added.\n");
 
-    // Print the nodes of the tree
+    
     printf("Printing tree nodes: ");
     print_tree_nodes(tree->root);
     printf("\n");
 
-    // Test clear_tree() and clear_node()
+    
     printf("Clearing tree...\n");
     clear_tree(tree);
     printf("Tree cleared.\n");
