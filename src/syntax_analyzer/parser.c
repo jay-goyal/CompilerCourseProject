@@ -78,6 +78,84 @@ pt_t create_parse_table(gram_t *gram, set_t **first_sets, set_t **follow_sets) {
             }
         }
     }
-
     return pt;
+}
+
+/* STACK */
+stack_t *create_stack() {
+    stack_t *stack = (stack_t *) malloc(sizeof(stack_t));
+    stack->size = 0;
+    return stack;
+}
+
+void push(stack_t *stack, int val) {
+    stack->size++;
+    stack->data = (int *) realloc(stack->data, stack->size * sizeof(int));
+    stack->data[stack->size-1] = val;
+}
+
+void pop(stack_t *stack) {
+    if(stack->size == 0) {
+        printf("Stack underflow\n");
+        return;
+    }
+    stack->size--;
+    stack->data = (int *) realloc(stack->data, stack->size * sizeof(int));
+}
+
+int top(stack_t *stack) {
+    if(stack->size == 0) {
+        printf("Stack underflow\n");
+        return -1;
+    }
+    return stack->data[stack->size-1];
+}
+
+bool is_empty(stack_t *stack) {
+    return stack->size == 0;
+}
+
+void clear_stack(stack_t *stack) {
+    free(stack->data);
+    free(stack);
+}
+
+/* TREE */
+tree_t *create_tree() {
+    tree_t *tree = (tree_t *) malloc(sizeof(tree_t));
+    tree->root = NULL;
+    return tree;
+}
+
+void insert_tree(tree_t *tree, tnode_t *node) {
+    tree->root = node;
+}
+
+tnode_t *create_node(int val) {
+    tnode_t *node = (tnode_t *) malloc(sizeof(tnode_t));
+    node->val = val;
+    node->num_children = 0;
+    node->children = NULL;
+    return node;
+}
+
+void insert_node(tnode_t *parent, tnode_t *child) {
+    parent->num_children++;
+    parent->children = (tnode_t **) realloc(parent->children, parent->num_children * sizeof(tnode_t *));
+    parent->children[parent->num_children-1] = child;
+}
+
+void clear_node(tnode_t *node) {
+    for(int i=0; i<node->num_children; i++) {
+        clear_node(node->children[i]);
+    }
+    free(node->children);
+    free(node);
+}
+
+void clear_tree(tree_t *tree) {
+    for(int i=0; i<tree->root->num_children; i++) {
+        clear_node(tree->root->children[i]);
+    }
+    free(tree);
 }
