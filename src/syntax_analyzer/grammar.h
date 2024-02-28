@@ -59,6 +59,9 @@
 #define OPTION_SINGLE_CONSTRUCTED 110
 #define BOTTOMMARKER 111
 
+#define NUM_TERMINALS 57
+#define NUM_NONTERMINALS 54
+
 static char *non_terminals[] = {
     "PROGRAM",
     "MAINFUNCTION",
@@ -114,7 +117,6 @@ static char *non_terminals[] = {
     "DEFINETYPESTMT",
     "A",
     "OPTION_SINGLE_CONSTRUCTED",
-    "BOTTOMMARKER",
 };
 
 typedef struct Production
@@ -150,5 +152,6 @@ void compute_first(set_t **first_sets, gram_t *gram, nt_t *nonterm, int nt_index
 set_t **compute_first_sets(gram_t *gram);
 void compute_follow(set_t **follow_sets, set_t **first_sets, gram_t *gram, nt_t *nonterm, int nt_index);
 set_t **compute_follow_sets(gram_t *gram, set_t **first_sets);
+void clear_sets(set_t **set);
 
 #endif

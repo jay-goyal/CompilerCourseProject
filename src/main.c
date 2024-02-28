@@ -5,6 +5,7 @@
 #include "lexical_analyzer/lexer.h"
 #include "lexical_analyzer/lexer_types.h"
 #include "syntax_analyzer/grammar.h"
+#include "syntax_analyzer/parser.h"
 
 void populate_symbol_table(ht_t* st) {
     stentry_t* entry = (stentry_t*)calloc(1, sizeof(stentry_t));
@@ -212,6 +213,12 @@ int main(int argc, char* argv[]) {
 
     gram_t* gram = create_grammar();
 
+    set_t **first_sets = compute_first_sets(gram);
+    
+    set_t **follow_sets = compute_follow_sets(gram, first_sets);
+    
+    pt_t pt = create_parse_table(gram, first_sets, follow_sets);
+
     // tokeninfo_t ret_token = get_next_token("test.txt", symbol_table);
     // while (ret_token.token_type != -2) {
     //     switch (ret_token.token_type) {
@@ -238,6 +245,9 @@ int main(int argc, char* argv[]) {
     // }
     
     clear_grammar(gram);
+    clear_sets(first_sets);
+    clear_sets(follow_sets);
+    // printf("%d")
 
     return 0;
 }

@@ -2,9 +2,6 @@
 #include "../lexical_analyzer/lexer_types.h"
 #include <stdlib.h>
 
-#define NUM_TERMINALS 57
-#define NUM_NONTERMINALS 54
-
 bool visited[NUM_NONTERMINALS] = {0};
 int occur[NUM_NONTERMINALS][NUM_NONTERMINALS] = {{0}};
 
@@ -14,15 +11,6 @@ gram_t *create_grammar()
     gram->nonterminals = (nt_t **) calloc(NUM_NONTERMINALS, sizeof(nt_t *));
 
     populate_productions(gram);
-
-    set_t **first_sets = compute_first_sets(gram);
-
-    for(int i=0; i<NUM_NONTERMINALS; i++) {
-        visited[i] = false;
-    }
-
-    set_t **follow_sets = compute_follow_sets(gram, first_sets);
-
     return gram;
 }
 
@@ -96,6 +84,9 @@ void compute_first(set_t ** first_sets, gram_t *gram, nt_t *nonterm, int nt_inde
 }
 
 set_t **compute_follow_sets(gram_t *gram, set_t **first_sets) {
+    for(int i=0; i<NUM_NONTERMINALS; i++) {
+        visited[i] = false;
+    }
     set_t **follow_sets = (set_t **) calloc(NUM_NONTERMINALS, sizeof(set_t *));
     
     for(int i=0; i<NUM_NONTERMINALS; i++) {
@@ -106,23 +97,23 @@ set_t **compute_follow_sets(gram_t *gram, set_t **first_sets) {
         compute_follow(follow_sets, first_sets, gram, gram->nonterminals[i], i);
     }
 
-    for(int i=0; i<NUM_NONTERMINALS; i++) {
-        printf("Follow set for %d: ", i);
-        for(int j=0; j<=NUM_TERMINALS+1; j++) {
-            if(follow_sets[i]->term[j] == 1) {
-                if(j == 0) {
-                    printf("EPSILON ");
-                }
-                else if(j == NUM_TERMINALS+1) {
-                    printf("$ ");
-                }
-                else {
-                    printf("%s ", token_str[j-1]);
-                }
-            }
-        }
-        printf("\n");
-    }
+    // for(int i=0; i<NUM_NONTERMINALS; i++) {
+    //     printf("Follow set for %d: ", i);
+    //     for(int j=0; j<=NUM_TERMINALS+1; j++) {
+    //         if(follow_sets[i]->term[j] == 1) {
+    //             if(j == 0) {
+    //                 printf("EPSILON ");
+    //             }
+    //             else if(j == NUM_TERMINALS+1) {
+    //                 printf("$ ");
+    //             }
+    //             else {
+    //                 printf("%s ", token_str[j-1]);
+    //             }
+    //         }
+    //     }
+    //     printf("\n");
+    // }
     return follow_sets;
 }
 
@@ -198,6 +189,13 @@ void compute_follow(set_t ** follow_sets, set_t **first_sets, gram_t *gram, nt_t
             }
         }
     }
+}
+
+void clear_sets(set_t **sets) {
+    for(int i=0; i<NUM_NONTERMINALS; i++) {
+        free(sets[i]);
+    }
+    free(sets);
 }
 
 nt_t *add_nonterminal(gram_t *gram, int nt)
