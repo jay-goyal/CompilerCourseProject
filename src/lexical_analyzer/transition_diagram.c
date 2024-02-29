@@ -1,4 +1,5 @@
 #include "transition_diagram.h"
+
 #include "lexer_types.h"
 
 state_t* create_state(int retract, bool exit, bool line_increment,
@@ -126,11 +127,11 @@ state_t** create_transition_diagram() {
     add_transition(td[2], "\0\x7f", 60);
 
     add_transition(td[3], "--", 4);
-    
+
     add_transition(td[8], "09", 8);
     add_transition(td[8], "..", 11);
     add_transition(td[8], "\0\x7f", 9);
-    
+
     add_transition(td[11], "09", 12);
     add_transition(td[11], "\0\x7f", 63);
 
@@ -146,10 +147,10 @@ state_t** create_transition_diagram() {
     add_transition(td[15], "09", 16);
 
     add_transition(td[16], "09", 17);
-    
+
     add_transition(td[19], "az", 20);
     add_transition(td[19], "AZ", 20);
-    
+
     add_transition(td[20], "az", 20);
     add_transition(td[20], "AZ", 20);
     add_transition(td[20], "09", 21);
@@ -157,13 +158,13 @@ state_t** create_transition_diagram() {
 
     add_transition(td[21], "09", 21);
     add_transition(td[21], "\0\x7f", 22);
-    
+
     add_transition(td[23], "@@", 24);
-    
+
     add_transition(td[24], "@@", 25);
-    
+
     add_transition(td[26], "az", 27);
-    
+
     add_transition(td[27], "az", 27);
     add_transition(td[27], "\0\x7f", 28);
 
@@ -182,6 +183,7 @@ state_t** create_transition_diagram() {
     add_transition(td[39], "\0\x7f", 44);
 
     add_transition(td[40], "27", 41);
+    add_transition(td[40], "bd", 40);
     add_transition(td[40], "\0\x7f", 42);
 
     add_transition(td[41], "27", 41);
@@ -189,11 +191,11 @@ state_t** create_transition_diagram() {
 
     add_transition(td[43], "az", 43);
     add_transition(td[43], "\0\x7f", 44);
-    
+
     add_transition(td[46], "==", 47);
-    
+
     add_transition(td[48], "==", 49);
-    
+
     add_transition(td[50], "==", 52);
     add_transition(td[50], "\0\x7f", 51);
 

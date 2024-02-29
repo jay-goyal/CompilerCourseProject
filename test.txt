@@ -1,4 +1,7 @@
-123 145.45145.45E10
-lexer
-lorem ipsum dolor sit amet qui minim labore adipisicing minim sint cillum sint consectetur cupidatat
-lorem ipsum dolor sit amet qui minim labore adipisicing minim sint cillum sint consectetur cupidatat
+_main [
+    dummy
+    while
+#asdfasfa
+        b2b27
+    ()
+]

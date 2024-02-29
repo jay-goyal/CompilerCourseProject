@@ -61,10 +61,24 @@ tokeninfo_t get_next_token(char* filename, ht_t* symbol_table) {
 start_parsing:
     while (!td[curr_state]->is_final) {
         char curr_char = buffer[forward];
+        if (curr_char == '\0') {
+            is_end = true;
+            free(buffer);
+            close(fptr);
+            clear_transition_diagram(td);
+            buffer = NULL;
+            fptr = -1;
+            td = NULL;
+            ret_token.token_type = -1;
+            return ret_token;
+        }
         curr_state = get_next_state(curr_state, curr_char, td);
         if (curr_state == -1) {
             forward += 1;
             int val_len = forward - begin + 1;
+            if (val_len < 0) {
+                val_len = TBUF_SIZE - begin + forward;
+            }
             forward = forward % TBUF_SIZE;
             int tmp =
                 populate_twin_buffers(begin, forward, buffer, &fptr, &prev_buf);
@@ -92,6 +106,9 @@ start_parsing:
     int token = td[curr_state]->token;
     forward -= td[curr_state]->retract - 1;
     int val_len = forward - begin + 1;
+    if (val_len < 0) {
+        val_len = TBUF_SIZE - begin + forward;
+    }
     forward = forward % TBUF_SIZE;
     int tmp = populate_twin_buffers(begin, forward, buffer, &fptr, &prev_buf);
     if (tmp != -1) res_read = tmp;

@@ -1,101 +1,81 @@
 #include "parser.h"
 
-pt_t create_parse_table(gram_t *gram, set_t **first_sets, set_t **follow_sets)
-{
+pt_t create_parse_table(gram_t *gram, set_t **first_sets, set_t **follow_sets) {
     pt_t pt;
     pt.table = (prod_t ***)calloc(NUM_NONTERMINALS, sizeof(prod_t **));
     prod_t *synch = create_production();
 
-    for (int i = 0; i < NUM_NONTERMINALS; i++)
-    {
+    for (int i = 0; i < NUM_NONTERMINALS; i++) {
         // include epsilon and $ in the table
         pt.table[i] = (prod_t **)calloc(NUM_TERMINALS + 2, sizeof(prod_t *));
-        for (int j = 0; j < NUM_TERMINALS + 2; j++)
-        {
+        for (int j = 0; j < NUM_TERMINALS + 2; j++) {
             pt.table[i][j] = NULL;
-            if (follow_sets[i]->term[j] == 1)
-            {
+            if (follow_sets[i]->term[j] == 1) {
                 pt.table[i][j] = synch;
             }
         }
     }
 
-    for (int i = 0; i < NUM_NONTERMINALS; i++)
-    {
+    for (int i = 0; i < NUM_NONTERMINALS; i++) {
         int num_prod = gram->nonterminals[i]->num_prod;
-        for (int k = 0; k < num_prod; k++)
-        {
+        for (int k = 0; k < num_prod; k++) {
             // each terminal in First(alpha)
             int num_right = gram->nonterminals[i]->productions[k]->num_right;
             bool flag = 0;
-            for (int l = 0; l < num_right; l++)
-            {
+            for (int l = 0; l < num_right; l++) {
                 int right = gram->nonterminals[i]->productions[k]->right[l];
-                if (right == -1)
-                {
-                    for (int m = 1; m <= NUM_TERMINALS + 1; m++)
-                    {
-                        if (follow_sets[i]->term[m] == 1)
-                        {
-                            pt.table[i][m] = gram->nonterminals[i]->productions[k];
+                if (right == -1) {
+                    for (int m = 1; m <= NUM_TERMINALS + 1; m++) {
+                        if (follow_sets[i]->term[m] == 1) {
+                            pt.table[i][m] =
+                                gram->nonterminals[i]->productions[k];
                         }
                     }
                     flag = 1;
                     // break;
-                }
-                else if (right < NUM_TERMINALS)
-                {
-                    pt.table[i][right + 1] = gram->nonterminals[i]->productions[k];
+                } else if (right < NUM_TERMINALS) {
+                    pt.table[i][right + 1] =
+                        gram->nonterminals[i]->productions[k];
                     flag = 1;
                     break;
-                }
-                else if (right >= NUM_TERMINALS)
-                {
-                    for (int j = 1; j <= NUM_TERMINALS; j++)
-                    {
-                        if (first_sets[right - NUM_TERMINALS]->term[j] == 1)
-                        {
-                            pt.table[i][j] = gram->nonterminals[i]->productions[k];
+                } else if (right >= NUM_TERMINALS) {
+                    for (int j = 1; j <= NUM_TERMINALS; j++) {
+                        if (first_sets[right - NUM_TERMINALS]->term[j] == 1) {
+                            pt.table[i][j] =
+                                gram->nonterminals[i]->productions[k];
                         }
                     }
-                    if (first_sets[right - NUM_TERMINALS]->term[0] == 0)
-                    {
+                    if (first_sets[right - NUM_TERMINALS]->term[0] == 0) {
                         flag = 1;
                         break;
                     }
                 }
             }
             // epsilon in first set
-            if (!flag)
-            {
-                for (int l = 1; l <= NUM_TERMINALS + 1; l++)
-                {
-                    if (follow_sets[i]->term[l] == 1)
-                    {
-                        pt.table[i][l] = gram->nonterminals[i]->productions[num_prod - 1];
+            if (!flag) {
+                for (int l = 1; l <= NUM_TERMINALS + 1; l++) {
+                    if (follow_sets[i]->term[l] == 1) {
+                        pt.table[i][l] =
+                            gram->nonterminals[i]->productions[num_prod - 1];
                     }
                 }
             }
         }
     }
 
-    for (int i = 0; i < NUM_NONTERMINALS; i++)
-    {
-        for (int j = 1; j <= NUM_TERMINALS + 1; j++)
-        {
-            if (pt.table[i][j] != NULL)
-            {
-                printf("-------------NONTERMINAL %s-------------\n", non_terminals[i]);
+    for (int i = 0; i < NUM_NONTERMINALS; i++) {
+        for (int j = 1; j <= NUM_TERMINALS + 1; j++) {
+            if (pt.table[i][j] != NULL) {
+                printf("-------------NONTERMINAL %s-------------\n",
+                       non_terminals[i]);
                 if (j <= NUM_TERMINALS)
                     printf("TERMINAL %s \n", token_str[j - 1]);
                 else
                     printf("TERMINAL $ \n");
                 int num_right = pt.table[i][j]->num_right;
                 printf("%s -> ", non_terminals[i]);
-                if (num_right == 0)
-                    printf("SYNCH");
-                for (int l = 0; l < num_right; l++)
-                {
+                if (num_right == 0) printf("SYNCH");
+                for (int l = 0; l < num_right; l++) {
                     int right = pt.table[i][j]->right[l];
                     if (right == -1)
                         printf("EPSILON ");
@@ -113,8 +93,7 @@ pt_t create_parse_table(gram_t *gram, set_t **first_sets, set_t **follow_sets)
 }
 
 /* STACK */
-stack_t *create_stack()
-{
+stack_t *create_stack() {
     stack_t *stack = (stack_t *)malloc(sizeof(stack_t));
     stack->size = 0;
     return stack;
@@ -122,33 +101,30 @@ stack_t *create_stack()
 
 void push(stack_t *stack, tnode_t *node) {
     stack->size++;
-    stack->nodes = (tnode_t **) realloc(stack->nodes, stack->size * sizeof(tnode_t *));
-    stack->nodes[stack->size-1] = node;
+    stack->nodes =
+        (tnode_t **)realloc(stack->nodes, stack->size * sizeof(tnode_t *));
+    stack->nodes[stack->size - 1] = node;
 }
 
-void pop(stack_t *stack)
-{
-    if (stack->size == 0)
-    {
+void pop(stack_t *stack) {
+    if (stack->size == 0) {
         printf("Stack underflow\n");
         return;
     }
     stack->size--;
-    stack->nodes = (tnode_t **) realloc(stack->nodes, stack->size * sizeof(tnode_t *));
+    stack->nodes =
+        (tnode_t **)realloc(stack->nodes, stack->size * sizeof(tnode_t *));
 }
 
 tnode_t *top(stack_t *stack) {
-    if(stack->size == 0) {
+    if (stack->size == 0) {
         printf("Stack underflow\n");
         return NULL;
     }
-    return stack->nodes[stack->size-1];
+    return stack->nodes[stack->size - 1];
 }
 
-bool is_empty(stack_t *stack)
-{
-    return stack->size == 0;
-}
+bool is_empty(stack_t *stack) { return stack->size == 0; }
 
 void clear_stack(stack_t *stack) {
     free(stack->nodes);
@@ -156,20 +132,16 @@ void clear_stack(stack_t *stack) {
 }
 
 /* TREE */
-tree_t *create_tree()
-{
+tree_t *create_tree() {
     tree_t *tree = (tree_t *)malloc(sizeof(tree_t));
     tree->root = NULL;
     return tree;
 }
 
-void insert_tree(tree_t *tree, tnode_t *node)
-{
-    tree->root = node;
-}
+void insert_tree(tree_t *tree, tnode_t *node) { tree->root = node; }
 
 tnode_t *create_tnode(int val) {
-    tnode_t *node = (tnode_t *) malloc(sizeof(tnode_t));
+    tnode_t *node = (tnode_t *)malloc(sizeof(tnode_t));
     node->val = val;
     node->num_children = 0;
     node->children = NULL;
@@ -178,24 +150,21 @@ tnode_t *create_tnode(int val) {
 
 void insert_tnode(tnode_t *parent, tnode_t *child) {
     parent->num_children++;
-    parent->children = (tnode_t **)realloc(parent->children, parent->num_children * sizeof(tnode_t *));
+    parent->children = (tnode_t **)realloc(
+        parent->children, parent->num_children * sizeof(tnode_t *));
     parent->children[parent->num_children - 1] = child;
 }
 
-void clear_node(tnode_t *node)
-{
-    for (int i = 0; i < node->num_children; i++)
-    {
+void clear_node(tnode_t *node) {
+    for (int i = 0; i < node->num_children; i++) {
         clear_node(node->children[i]);
     }
     free(node->children);
     free(node);
 }
 
-void clear_tree(tree_t *tree)
-{
-    for (int i = 0; i < tree->root->num_children; i++)
-    {
+void clear_tree(tree_t *tree) {
+    for (int i = 0; i < tree->root->num_children; i++) {
         clear_node(tree->root->children[i]);
     }
     free(tree);
@@ -212,47 +181,56 @@ tree_t *create_parse_tree(int *input, int len, pt_t pt) {
 
     int i = 0;
 
-    while(stack->size > 1) {
+    while (stack->size > 1) {
         tnode_t *curr_node = top(stack);
         pop(stack);
         // top is a non terminal
-        if(curr_node->val >= NUM_TERMINALS) {
+        if (curr_node->val >= NUM_TERMINALS) {
             // error -> skip
-            if(pt.table[curr_node->val-NUM_TERMINALS][input[i]+1] == NULL) {
+            if (pt.table[curr_node->val - NUM_TERMINALS][input[i] + 1] ==
+                NULL) {
                 printf("SYNTAX ERROR!\n");
             }
             // synch -> error recovery
-            else if(pt.table[curr_node->val-NUM_TERMINALS][input[i]+1]->num_right == 0) {
+            else if (pt.table[curr_node->val - NUM_TERMINALS][input[i] + 1]
+                         ->num_right == 0) {
                 pop(stack);
                 printf("SYNTAX ERROR!\n");
-            }
-            else {
-                printf("Pop %s\n", non_terminals[curr_node->val-NUM_TERMINALS]);
-                int num_right = pt.table[curr_node->val-NUM_TERMINALS][input[i]+1]->num_right;
-                if(num_right == 1 && pt.table[curr_node->val-NUM_TERMINALS][input[i]+1]->right[0] == -1) {
+            } else {
+                printf("Pop %s\n",
+                       non_terminals[curr_node->val - NUM_TERMINALS]);
+                int num_right =
+                    pt.table[curr_node->val - NUM_TERMINALS][input[i] + 1]
+                        ->num_right;
+                if (num_right == 1 &&
+                    pt.table[curr_node->val - NUM_TERMINALS][input[i] + 1]
+                            ->right[0] == -1) {
                     continue;
                 }
-                for(int j=0; j<num_right; j++) {
-                    node = create_tnode(pt.table[curr_node->val-NUM_TERMINALS][input[i]+1]->right[j]);
+                for (int j = 0; j < num_right; j++) {
+                    node = create_tnode(
+                        pt.table[curr_node->val - NUM_TERMINALS][input[i] + 1]
+                            ->right[j]);
                     insert_tnode(curr_node, node);
                 }
-                for(int j=num_right-1; j>=0; j--) {
+                for (int j = num_right - 1; j >= 0; j--) {
                     push(stack, curr_node->children[j]);
-                    if(curr_node->children[j]->val >= NUM_TERMINALS) {
-                        printf("Push %s\n", non_terminals[curr_node->children[j]->val-NUM_TERMINALS]);
-                    }
-                    else {
-                        printf("Push %s\n", token_str[curr_node->children[j]->val]);
+                    if (curr_node->children[j]->val >= NUM_TERMINALS) {
+                        printf("Push %s\n",
+                               non_terminals[curr_node->children[j]->val -
+                                             NUM_TERMINALS]);
+                    } else {
+                        printf("Push %s\n",
+                               token_str[curr_node->children[j]->val]);
                     }
                 }
             }
         }
         // top is a terminal
         else {
-            if(curr_node->val == input[i]) {
+            if (curr_node->val == input[i]) {
                 i++;
-            }
-            else {
+            } else {
                 printf("SYNTAX ERROR!\n");
             }
         }

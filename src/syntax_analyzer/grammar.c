@@ -1,12 +1,13 @@
 #include "grammar.h"
-#include "../lexical_analyzer/lexer_types.h"
+
 #include <stdlib.h>
+
+#include "../lexical_analyzer/lexer_types.h"
 
 bool visited[NUM_NONTERMINALS] = {0};
 int occur[NUM_NONTERMINALS][NUM_NONTERMINALS] = {{0}};
 
-gram_t *create_grammar()
-{
+gram_t *create_grammar() {
     gram_t *gram = (gram_t *)malloc(sizeof(gram_t));
     gram->nonterminals = (nt_t **)calloc(NUM_NONTERMINALS, sizeof(nt_t *));
 
@@ -14,12 +15,9 @@ gram_t *create_grammar()
     return gram;
 }
 
-void clear_grammar(gram_t *gram)
-{
-    for (int i = 0; i < NUM_NONTERMINALS; i++)
-    {
-        for (int j = 0; j < gram->nonterminals[i]->num_prod; j++)
-        {
+void clear_grammar(gram_t *gram) {
+    for (int i = 0; i < NUM_NONTERMINALS; i++) {
+        for (int j = 0; j < gram->nonterminals[i]->num_prod; j++) {
             free(gram->nonterminals[i]->productions[j]->right);
             free(gram->nonterminals[i]->productions[j]);
         }
@@ -30,56 +28,44 @@ void clear_grammar(gram_t *gram)
     free(gram);
 }
 
-set_t **compute_first_sets(gram_t *gram)
-{
+set_t **compute_first_sets(gram_t *gram) {
     set_t **first_sets = (set_t **)calloc(NUM_NONTERMINALS, sizeof(set_t *));
-    for (int i = 0; i < NUM_NONTERMINALS; i++)
-    {
+    for (int i = 0; i < NUM_NONTERMINALS; i++) {
         first_sets[i] = (set_t *)malloc(sizeof(set_t));
     }
 
-    for (int i = 0; i < NUM_NONTERMINALS; i++)
-    {
+    for (int i = 0; i < NUM_NONTERMINALS; i++) {
         compute_first(first_sets, gram, gram->nonterminals[i], i);
     }
     return first_sets;
 }
 
-void compute_first(set_t **first_sets, gram_t *gram, nt_t *nonterm, int nt_index)
-{
-    if (visited[nt_index])
-    {
+void compute_first(set_t **first_sets, gram_t *gram, nt_t *nonterm,
+                   int nt_index) {
+    if (visited[nt_index]) {
         return;
     }
 
     visited[nt_index] = true;
     int num_prod = nonterm->num_prod;
-    for (int i = 0; i < num_prod; i++)
-    {
-        for (int k = 0; k < nonterm->productions[i]->num_right; k++)
-        {
+    for (int i = 0; i < num_prod; i++) {
+        for (int k = 0; k < nonterm->productions[i]->num_right; k++) {
             int symb = nonterm->productions[i]->right[k];
-            if (symb <= NUM_TERMINALS)
-            {
+            if (symb <= NUM_TERMINALS) {
                 first_sets[nt_index]->term[symb + 1] = 1;
                 break;
-            }
-            else
-            {
-                compute_first(first_sets, gram, gram->nonterminals[symb - NUM_TERMINALS], symb - NUM_TERMINALS);
+            } else {
+                compute_first(first_sets, gram,
+                              gram->nonterminals[symb - NUM_TERMINALS],
+                              symb - NUM_TERMINALS);
                 set_t *firstN = first_sets[symb - NUM_TERMINALS];
-                for (int j = 0; j <= NUM_TERMINALS; j++)
-                {
-                    if (firstN->term[j] == 1)
-                        first_sets[nt_index]->term[j] = 1;
+                for (int j = 0; j <= NUM_TERMINALS; j++) {
+                    if (firstN->term[j] == 1) first_sets[nt_index]->term[j] = 1;
                 }
                 // not epsilon
-                if (firstN->term[0] == 0)
-                {
+                if (firstN->term[0] == 0) {
                     break;
-                }
-                else
-                {
+                } else {
                     first_sets[nt_index]->term[0] = 0;
                 }
             }
@@ -87,21 +73,17 @@ void compute_first(set_t **first_sets, gram_t *gram, nt_t *nonterm, int nt_index
     }
 }
 
-set_t **compute_follow_sets(gram_t *gram, set_t **first_sets)
-{
-    for (int i = 0; i < NUM_NONTERMINALS; i++)
-    {
+set_t **compute_follow_sets(gram_t *gram, set_t **first_sets) {
+    for (int i = 0; i < NUM_NONTERMINALS; i++) {
         visited[i] = false;
     }
     set_t **follow_sets = (set_t **)calloc(NUM_NONTERMINALS, sizeof(set_t *));
 
-    for (int i = 0; i < NUM_NONTERMINALS; i++)
-    {
+    for (int i = 0; i < NUM_NONTERMINALS; i++) {
         follow_sets[i] = (set_t *)malloc(sizeof(set_t));
     }
 
-    for (int i = 0; i < NUM_NONTERMINALS; i++)
-    {
+    for (int i = 0; i < NUM_NONTERMINALS; i++) {
         compute_follow(follow_sets, first_sets, gram, gram->nonterminals[i], i);
     }
 
@@ -125,63 +107,57 @@ set_t **compute_follow_sets(gram_t *gram, set_t **first_sets)
     return follow_sets;
 }
 
-void compute_follow(set_t **follow_sets, set_t **first_sets, gram_t *gram, nt_t *nonterm, int nt_index)
-{
-    if (visited[nt_index])
-    {
+void compute_follow(set_t **follow_sets, set_t **first_sets, gram_t *gram,
+                    nt_t *nonterm, int nt_index) {
+    if (visited[nt_index]) {
         return;
     }
 
     visited[nt_index] = true;
     int num_prod = nonterm->num_prod;
-    if (nt_index == 0)
-    {
+    if (nt_index == 0) {
         // bottom marker
         follow_sets[nt_index]->term[NUM_TERMINALS + 1] = 1;
     }
 
-    for (int i = 0; i < NUM_NONTERMINALS; i++)
-    {
-        if (occur[nt_index][i] == 1)
-        {
+    for (int i = 0; i < NUM_NONTERMINALS; i++) {
+        if (occur[nt_index][i] == 1) {
             int num_prod = gram->nonterminals[i]->num_prod;
-            for (int j = 0; j < num_prod; j++)
-            {
-                int num_right = gram->nonterminals[i]->productions[j]->num_right;
+            for (int j = 0; j < num_prod; j++) {
+                int num_right =
+                    gram->nonterminals[i]->productions[j]->num_right;
                 bool flag = false;
-                for (int k = 0; k < num_right; k++)
-                {
-                    if (gram->nonterminals[i]->productions[j]->right[k] == nt_index + NUM_TERMINALS)
-                    {
+                for (int k = 0; k < num_right; k++) {
+                    if (gram->nonterminals[i]->productions[j]->right[k] ==
+                        nt_index + NUM_TERMINALS) {
                         flag = true;
                         continue;
                     }
-                    if (flag)
-                    {
-                        if (gram->nonterminals[i]->productions[j]->right[k] < NUM_TERMINALS)
-                        {
-                            follow_sets[nt_index]->term[gram->nonterminals[i]->productions[j]->right[k] + 1] = 1;
+                    if (flag) {
+                        if (gram->nonterminals[i]->productions[j]->right[k] <
+                            NUM_TERMINALS) {
+                            follow_sets[nt_index]->term[gram->nonterminals[i]
+                                                            ->productions[j]
+                                                            ->right[k] +
+                                                        1] = 1;
                             break;
-                        }
-                        else
-                        {
-                            set_t *firstN = first_sets[gram->nonterminals[i]->productions[j]->right[k] - NUM_TERMINALS];
-                            for (int l = 0; l <= NUM_TERMINALS + 1; l++)
-                            {
-                                if (firstN->term[l] == 1)
-                                {
+                        } else {
+                            set_t *firstN = first_sets[gram->nonterminals[i]
+                                                           ->productions[j]
+                                                           ->right[k] -
+                                                       NUM_TERMINALS];
+                            for (int l = 0; l <= NUM_TERMINALS + 1; l++) {
+                                if (firstN->term[l] == 1) {
                                     follow_sets[nt_index]->term[l] = 1;
                                 }
                             }
                             // epsilon in first(nonterminal)
-                            if (firstN->term[0] == 1)
-                            {
+                            if (firstN->term[0] == 1) {
                                 if (k != num_right - 1)
                                     follow_sets[nt_index]->term[0] = 0;
                             }
                             // not epsilon
-                            else
-                            {
+                            else {
                                 flag = false;
                                 break;
                             }
@@ -189,28 +165,26 @@ void compute_follow(set_t **follow_sets, set_t **first_sets, gram_t *gram, nt_t 
                     }
                 }
 
-                if (gram->nonterminals[i]->productions[j]->right[num_right - 1] == nt_index + NUM_TERMINALS)
-                {
+                if (gram->nonterminals[i]
+                        ->productions[j]
+                        ->right[num_right - 1] == nt_index + NUM_TERMINALS) {
                     follow_sets[nt_index]->term[0] = 0;
-                    compute_follow(follow_sets, first_sets, gram, gram->nonterminals[i], i);
-                    for (int l = 0; l <= NUM_TERMINALS + 1; l++)
-                    {
-                        if (follow_sets[i]->term[l] == 1)
-                        {
+                    compute_follow(follow_sets, first_sets, gram,
+                                   gram->nonterminals[i], i);
+                    for (int l = 0; l <= NUM_TERMINALS + 1; l++) {
+                        if (follow_sets[i]->term[l] == 1) {
                             follow_sets[nt_index]->term[l] = 1;
                         }
                     }
                 }
             }
 
-            if (follow_sets[nt_index]->term[0] == 1)
-            {
+            if (follow_sets[nt_index]->term[0] == 1) {
                 follow_sets[nt_index]->term[0] = 0;
-                compute_follow(follow_sets, first_sets, gram, gram->nonterminals[i], i);
-                for (int l = 0; l <= NUM_TERMINALS + 1; l++)
-                {
-                    if (follow_sets[i]->term[l] == 1)
-                    {
+                compute_follow(follow_sets, first_sets, gram,
+                               gram->nonterminals[i], i);
+                for (int l = 0; l <= NUM_TERMINALS + 1; l++) {
+                    if (follow_sets[i]->term[l] == 1) {
                         follow_sets[nt_index]->term[l] = 1;
                     }
                 }
@@ -219,49 +193,42 @@ void compute_follow(set_t **follow_sets, set_t **first_sets, gram_t *gram, nt_t 
     }
 }
 
-void clear_sets(set_t **sets)
-{
-    for (int i = 0; i < NUM_NONTERMINALS; i++)
-    {
+void clear_sets(set_t **sets) {
+    for (int i = 0; i < NUM_NONTERMINALS; i++) {
         free(sets[i]);
     }
     free(sets);
 }
 
-nt_t *add_nonterminal(gram_t *gram, int nt)
-{
+nt_t *add_nonterminal(gram_t *gram, int nt) {
     gram->nonterminals[nt - NUM_TERMINALS] = (nt_t *)malloc(sizeof(nt_t));
     gram->nonterminals[nt - NUM_TERMINALS]->num_prod = 0;
     return gram->nonterminals[nt - NUM_TERMINALS];
 }
 
-prod_t *create_production()
-{
+prod_t *create_production() {
     prod_t *prod = (prod_t *)malloc(sizeof(prod_t));
     prod->num_right = 0;
     return prod;
 }
 
-void add_production(nt_t *nonterm, prod_t *prod)
-{
+void add_production(nt_t *nonterm, prod_t *prod) {
     nonterm->num_prod++;
-    nonterm->productions = (prod_t **)realloc(nonterm->productions, nonterm->num_prod * sizeof(prod_t *));
+    nonterm->productions = (prod_t **)realloc(
+        nonterm->productions, nonterm->num_prod * sizeof(prod_t *));
     nonterm->productions[nonterm->num_prod - 1] = prod;
 }
 
-void add_right(prod_t *prod, int right, int nt)
-{
+void add_right(prod_t *prod, int right, int nt) {
     prod->num_right++;
     prod->right = (int *)realloc(prod->right, prod->num_right * sizeof(int));
     prod->right[prod->num_right - 1] = right;
-    if (right >= NUM_TERMINALS)
-    {
+    if (right >= NUM_TERMINALS) {
         occur[right - NUM_TERMINALS][nt - NUM_TERMINALS] = 1;
     }
 }
 
-void populate_productions(gram_t *gram)
-{
+void populate_productions(gram_t *gram) {
     nt_t *nonterm = add_nonterminal(gram, PROGRAM);
     prod_t *prod = create_production();
     add_right(prod, OTHERFUNCTIONS, PROGRAM);
