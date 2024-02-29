@@ -218,6 +218,13 @@ int main(int argc, char* argv[]) {
     
     pt_t pt = create_parse_table(gram, first_sets, follow_sets);
 
+    int *input = (int *)calloc(4, sizeof(int));
+    input[0] = TK_MAIN;
+    input[1] = TK_RETURN;
+    input[2] = TK_SEM;
+    input[3] = TK_END;
+    tree_t* parse_tree = create_parse_tree(input, 4, pt);
+
     // tokeninfo_t ret_token = get_next_token("test.txt", symbol_table);
     // while (ret_token.token_type != -2) {
     //     switch (ret_token.token_type) {

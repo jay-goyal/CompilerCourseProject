@@ -120,11 +120,10 @@ stack_t *create_stack()
     return stack;
 }
 
-void push(stack_t *stack, int val)
-{
+void push(stack_t *stack, tnode_t *node) {
     stack->size++;
-    stack->data = (int *)realloc(stack->data, stack->size * sizeof(int));
-    stack->data[stack->size - 1] = val;
+    stack->nodes = (tnode_t **) realloc(stack->nodes, stack->size * sizeof(tnode_t *));
+    stack->nodes[stack->size-1] = node;
 }
 
 void pop(stack_t *stack)
@@ -135,17 +134,15 @@ void pop(stack_t *stack)
         return;
     }
     stack->size--;
-    stack->data = (int *)realloc(stack->data, stack->size * sizeof(int));
+    stack->nodes = (tnode_t **) realloc(stack->nodes, stack->size * sizeof(tnode_t *));
 }
 
-int top(stack_t *stack)
-{
-    if (stack->size == 0)
-    {
+tnode_t *top(stack_t *stack) {
+    if(stack->size == 0) {
         printf("Stack underflow\n");
-        return -1;
+        return NULL;
     }
-    return stack->data[stack->size - 1];
+    return stack->nodes[stack->size-1];
 }
 
 bool is_empty(stack_t *stack)
@@ -153,9 +150,8 @@ bool is_empty(stack_t *stack)
     return stack->size == 0;
 }
 
-void clear_stack(stack_t *stack)
-{
-    free(stack->data);
+void clear_stack(stack_t *stack) {
+    free(stack->nodes);
     free(stack);
 }
 
@@ -172,17 +168,15 @@ void insert_tree(tree_t *tree, tnode_t *node)
     tree->root = node;
 }
 
-tnode_t *create_node(int val)
-{
-    tnode_t *node = (tnode_t *)malloc(sizeof(tnode_t));
+tnode_t *create_tnode(int val) {
+    tnode_t *node = (tnode_t *) malloc(sizeof(tnode_t));
     node->val = val;
     node->num_children = 0;
     node->children = NULL;
     return node;
 }
 
-void insert_node(tnode_t *parent, tnode_t *child)
-{
+void insert_tnode(tnode_t *parent, tnode_t *child) {
     parent->num_children++;
     parent->children = (tnode_t **)realloc(parent->children, parent->num_children * sizeof(tnode_t *));
     parent->children[parent->num_children - 1] = child;
@@ -205,4 +199,64 @@ void clear_tree(tree_t *tree)
         clear_node(tree->root->children[i]);
     }
     free(tree);
+}
+
+tree_t *create_parse_tree(int *input, int len, pt_t pt) {
+    tree_t *parse_tree = create_tree();
+    stack_t *stack = create_stack();
+    tnode_t *node = create_tnode(BOTTOMMARKER);
+    push(stack, node);
+    node = create_tnode(PROGRAM);
+    push(stack, node);
+    parse_tree->root = node;
+
+    int i = 0;
+
+    while(stack->size > 1) {
+        tnode_t *curr_node = top(stack);
+        pop(stack);
+        // top is a non terminal
+        if(curr_node->val >= NUM_TERMINALS) {
+            // error -> skip
+            if(pt.table[curr_node->val-NUM_TERMINALS][input[i]+1] == NULL) {
+                printf("SYNTAX ERROR!\n");
+            }
+            // synch -> error recovery
+            else if(pt.table[curr_node->val-NUM_TERMINALS][input[i]+1]->num_right == 0) {
+                pop(stack);
+                printf("SYNTAX ERROR!\n");
+            }
+            else {
+                printf("Pop %s\n", non_terminals[curr_node->val-NUM_TERMINALS]);
+                int num_right = pt.table[curr_node->val-NUM_TERMINALS][input[i]+1]->num_right;
+                if(num_right == 1 && pt.table[curr_node->val-NUM_TERMINALS][input[i]+1]->right[0] == -1) {
+                    continue;
+                }
+                for(int j=0; j<num_right; j++) {
+                    node = create_tnode(pt.table[curr_node->val-NUM_TERMINALS][input[i]+1]->right[j]);
+                    insert_tnode(curr_node, node);
+                }
+                for(int j=num_right-1; j>=0; j--) {
+                    push(stack, curr_node->children[j]);
+                    if(curr_node->children[j]->val >= NUM_TERMINALS) {
+                        printf("Push %s\n", non_terminals[curr_node->children[j]->val-NUM_TERMINALS]);
+                    }
+                    else {
+                        printf("Push %s\n", token_str[curr_node->children[j]->val]);
+                    }
+                }
+            }
+        }
+        // top is a terminal
+        else {
+            if(curr_node->val == input[i]) {
+                i++;
+            }
+            else {
+                printf("SYNTAX ERROR!\n");
+            }
+        }
+    }
+
+    return parse_tree;
 }
