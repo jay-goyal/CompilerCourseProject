@@ -1,7 +1,0 @@
-_main [
-    dummy
-    while
-#asdfasfa
-        b2b27
-    ()
-]

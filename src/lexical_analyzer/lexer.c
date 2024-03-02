@@ -17,7 +17,6 @@ int populate_twin_buffers(int begin, int forward, char* buffer, int* fptr,
     if (next == *prev_buf || next == active) {
         return -1;
     }
-    printf("READING\n");
     *prev_buf = next;
     return read(*fptr, buffer + (BUF_SIZE * next), BUF_SIZE);
 }
@@ -121,7 +120,7 @@ start_parsing:
     }
     if (td[curr_state]->line_increment) line_number++;
 
-    if (token > 0) {
+    if (token >= 0 && token != TK_COMMENT) {
         ret_token.token_type = token;
         switch (token) {
             case TK_NUM:

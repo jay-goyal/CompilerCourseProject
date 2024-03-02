@@ -15,10 +15,10 @@ DBGOBJ := $(subst src,$(DBGDIR),$(SOURCES:.c=.o))
 TGTDIRS := $(subst src,$(TGTDIR),$(dir $(SOURCES)))
 DBGDIRS := $(subst src,$(DBGDIR),$(dir $(SOURCES)))
 
-run: target
-	./$(TGTDIR)/compiler
-
 build: target
+
+run: target
+	./$(TGTDIR)/compiler $(filter-out $@,$(MAKECMDGOALS))
 
 target: $(TGTDIRS) $(SOURCES) $(HEADERS) $(TGTOBJ)
 	$(CC) -o $(TGTDIR)/compiler $(TGTOBJ)
@@ -40,3 +40,6 @@ $(TGTDIRS):
 
 $(DBGDIRS):
 	mkdir -p $(DBGDIRS)
+
+%:
+	@:

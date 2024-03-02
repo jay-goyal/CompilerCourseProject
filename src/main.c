@@ -206,7 +206,11 @@ void populate_symbol_table(ht_t* st) {
 }
 
 int main(int argc, char* argv[]) {
-    printf("RUNNING\n");
+    if (argc < 2) {
+        printf("Provide the filename for the testcase");
+        return -1;
+    }
+
     ht_t* symbol_table = create_hash_table();
     populate_symbol_table(symbol_table);
 
@@ -224,8 +228,9 @@ int main(int argc, char* argv[]) {
     // input[2] = TK_SEM;
     // input[3] = TK_END;
     // tree_t* parse_tree = create_parse_tree(input, 4, pt);
+    //
 
-    tokeninfo_t ret_token = get_next_token("test.txt", symbol_table);
+    tokeninfo_t ret_token = get_next_token(argv[1], symbol_table);
     while (ret_token.token_type != -1) {
         switch (ret_token.token_type) {
             case TK_NUM:
@@ -244,6 +249,7 @@ int main(int argc, char* argv[]) {
                        token_str[ret_token.token_type]);
                 break;
             case -1:
+            case -2:
                 break;
             default:
                 printf("%s\n", token_str[ret_token.token_type]);

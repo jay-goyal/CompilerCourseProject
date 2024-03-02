@@ -173,6 +173,7 @@ state_t** create_transition_diagram() {
     add_transition(td[30], "&&", 31);
 
     add_transition(td[33], "\n\n", 34);
+    add_transition(td[33], "\0\x7f", 33);
 
     add_transition(td[35], "  ", 35);
     add_transition(td[35], "\t\t", 35);
