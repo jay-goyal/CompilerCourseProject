@@ -43,7 +43,6 @@ void clear_tnode(tnode_t *node);
 void clear_tree(tree_t *tree);
 tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table,
                           char *lexer_op_file);
-void print_node(tnode_t *node, char *parser_op_file);
-void print_tree(tree_t *tree, char *parser_op_file);
-
+void print_node(tnode_t *node, int fptr);
+void print_parse_tree(tree_t *tree, char *parser_op_file);
 #endif

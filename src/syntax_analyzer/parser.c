@@ -1,5 +1,8 @@
 #include "parser.h"
 
+#include <fcntl.h>
+#include <unistd.h>
+
 pt_t create_parse_table(gram_t *gram, set_t **first_sets, set_t **follow_sets) {
     pt_t pt;
     pt.table = (prod_t ***)calloc(NUM_NONTERMINALS, sizeof(prod_t **));
@@ -189,7 +192,8 @@ tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table,
 
     while (ret_token.token_type != -1) {
         if (ret_token.token_type == -2) {
-            ret_token = get_next_token(src_filename, symbol_table, lexer_op_file);
+            ret_token =
+                get_next_token(src_filename, symbol_table, lexer_op_file);
         }
 
         if (stack->size == 1) {
@@ -222,14 +226,16 @@ tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table,
                                                   ->right[0] == -1) {
                     node = create_tnode(pt.table[curr_node->val - NUM_TERMINALS]
                                                 [ret_token.token_type + 1]
-                                                    ->right[0], ret_token);
+                                                    ->right[0],
+                                        ret_token);
                     insert_tnode(curr_node, node);
                     continue;
                 }
                 for (int j = 0; j < num_right; j++) {
                     node = create_tnode(pt.table[curr_node->val - NUM_TERMINALS]
                                                 [ret_token.token_type + 1]
-                                                    ->right[j], ret_token);
+                                                    ->right[j],
+                                        ret_token);
                     insert_tnode(curr_node, node);
                 }
                 for (int j = num_right - 1; j >= 0; j--) {
@@ -255,51 +261,69 @@ tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table,
         printf("Parse Successful\n");
     } else {
         if (ret_token.token_type >= 0)
-        printf("Lexical Error, Parser could not be run\n");
+            printf("Lexical Error, Parser could not be run\n");
         exit(-1);
     }
 
     return parse_tree;
 }
 
-// lexeme/"‐‐‐‐" CurrentNode lineno tokenName valueIfNumber parentNodeSymbol isLeafNode(yes/no) NodeSymbol
-void print_node(tnode_t *node, char *parser_op_file) {
+// lexeme/"‐‐‐‐" CurrentNode lineno tokenName valueIfNumber parentNodeSymbol
+// isLeafNode(yes/no) NodeSymbol
+void print_node(tnode_t *node, int fptr) {
     int num_children = node->num_children;
+    char buf[1500];
+    int len;
 
     // leaf node
-    if(num_children == 0) {
-        if(node->val == -1) {
-            printf("---- %d EPSILON ---- %s yes ----\n", node->tokeninfo.line_no, non_terminals[node->parent->val-NUM_TERMINALS]);
-        }
-        else {
-            printf("%s %d %s", node->tokeninfo.lexeme, node->tokeninfo.line_no, token_str[node->tokeninfo.token_type]);
-            if(node->tokeninfo.token_type == TK_NUM)
-                printf(" %d", node->tokeninfo.info.num_val);
-            else if(node->tokeninfo.token_type == TK_NUM)
-                printf(" %f", node->tokeninfo.info.rnum_val);
+    if (num_children == 0) {
+        if (node->val == -1) {
+            len = sprintf(buf, "---- %d EPSILON ---- %s yes ----\n",
+                          node->tokeninfo.line_no,
+                          non_terminals[node->parent->val - NUM_TERMINALS]);
+            write(fptr, buf, len);
+        } else {
+            len = sprintf(buf, "%s %d %s", node->tokeninfo.lexeme,
+                          node->tokeninfo.line_no,
+                          token_str[node->tokeninfo.token_type]);
+            write(fptr, buf, len);
+            if (node->tokeninfo.token_type == TK_NUM)
+                len = sprintf(buf, " %ld", node->tokeninfo.info.num_val);
+            else if (node->tokeninfo.token_type == TK_NUM)
+                len = sprintf(buf, " %f", node->tokeninfo.info.rnum_val);
             else
-                printf(" ----");
-            printf(" %s yes ----\n", non_terminals[node->parent->val-NUM_TERMINALS]);
+                len = sprintf(buf, " ----");
+            write(fptr, buf, len);
+            len = sprintf(buf, " %s yes ----\n",
+                          non_terminals[node->parent->val - NUM_TERMINALS]);
+            write(fptr, buf, len);
         }
         return;
     }
 
-    print_node(node->children[0], parser_op_file);
-    // printf("---- %d ---- ---- %s no %s\n", node->tokeninfo.line_no, non_terminals[node->parent->val-NUM_TERMINALS] ,non_terminals[node->val-NUM_TERMINALS]);
-    printf("---- %d ---- ----", node->tokeninfo.line_no);
-    if(node->val == PROGRAM) {
-        printf(" ROOT");
+    print_node(node->children[0], fptr);
+    // printf("---- %d ---- ---- %s no %s\n", node->tokeninfo.line_no,
+    // non_terminals[node->parent->val-NUM_TERMINALS]
+    // ,non_terminals[node->val-NUM_TERMINALS]);
+    len = sprintf(buf, "---- %d ---- ----", node->tokeninfo.line_no);
+    write(fptr, buf, len);
+    if (node->val == PROGRAM) {
+        len = sprintf(buf, " ROOT");
+        write(fptr, buf, len);
+    } else {
+        len = sprintf(buf, " %s", non_terminals[node->val - NUM_TERMINALS]);
+        write(fptr, buf, len);
     }
-    else {
-        printf(" %s", non_terminals[node->val-NUM_TERMINALS]);
-    }
-    printf(" no %s\n", non_terminals[node->val-NUM_TERMINALS]);
+    len = sprintf(buf, " no %s\n", non_terminals[node->val - NUM_TERMINALS]);
+    write(fptr, buf, len);
 
-    for(int i=1; i<num_children; i++) {
-        print_node(node->children[i], parser_op_file);
+    for (int i = 1; i < num_children; i++) {
+        print_node(node->children[i], fptr);
     }
 }
 
 void print_parse_tree(tree_t *tree, char *parser_op_file) {
-    print_node(tree->root, parser_op_file);
+    int fptr = open(parser_op_file, O_RDWR | O_CREAT, 0666);
+    print_node(tree->root, fptr);
+    close(fptr);
 }
