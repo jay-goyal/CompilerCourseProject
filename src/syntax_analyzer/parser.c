@@ -192,8 +192,8 @@ tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table,
 
     while (ret_token.token_type != -1) {
         if (ret_token.token_type == -2) {
-            ret_token =
-                get_next_token(src_filename, symbol_table, lexer_op_file);
+            ret_token = get_next_token(src_filename, symbol_table, lexer_op_file);
+            continue;
         }
 
         if (stack->size == 1) {
@@ -268,8 +268,6 @@ tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table,
     return parse_tree;
 }
 
-// lexeme/"‐‐‐‐" CurrentNode lineno tokenName valueIfNumber parentNodeSymbol
-// isLeafNode(yes/no) NodeSymbol
 void print_node(tnode_t *node, int fptr) {
     int num_children = node->num_children;
     char buf[1500];
