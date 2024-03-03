@@ -35,7 +35,6 @@ pt_t create_parse_table(gram_t *gram, set_t **first_sets, set_t **follow_sets) {
                         }
                     }
                     flag = 1;
-                    // break;
                 } else if (right < NUM_TERMINALS) {
                     pt.table[i][right + 1] =
                         gram->nonterminals[i]->productions[k];
@@ -65,36 +64,6 @@ pt_t create_parse_table(gram_t *gram, set_t **first_sets, set_t **follow_sets) {
             }
         }
     }
-
-    // for (int i = 0; i < NUM_NONTERMINALS; i++) {
-    //     for (int j = 1; j <= NUM_TERMINALS + 1; j++) {
-    //         if (pt.table[i][j] != NULL) {
-    //             printf("-------------NONTERMINAL %s-------------\n",
-    //                     non_terminals[i]);
-    //             if (j <= NUM_TERMINALS)
-    //                 printf("TERMINAL %s \n", token_str[j - 1]);
-    //             else
-    //                 printf("TERMINAL $ \n");
-    //             int num_right = pt.table[i][j]->num_right;
-    //             printf("%s -> ", non_terminals[i]);
-    //             if (num_right == 0) printf("SYNCH");
-    //             for (int l = 0; l < num_right; l++) {
-    //                 int right = pt.table[i][j]->right[l];
-    //                 if (right == -1)
-    //                     printf("EPSILON ");
-    //                 else if (right <= NUM_TERMINALS)
-    //                     printf("%s ", token_str[right]);
-    //                 else
-    //                     printf("%s ", non_terminals[right - NUM_TERMINALS]);
-    //             }
-    //             printf("\n");
-    //             printf("\n");
-    //         }
-    //     }
-    // }
-
-    // printf("%d\n",
-    // gram->nonterminals[RELATIONALOP-NUM_TERMINALS]->productions[3]->num_right);
     return pt;
 }
 
@@ -250,7 +219,7 @@ tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table,
                 ret_token =
                     get_next_token(src_filename, symbol_table, lexer_op_file);
             } else {
-                printf("Line No. %d: SYNTAX ERROR! Token: %s\n",
+                printf("Line No. %d: SYNTAX ERROR! Expected Token %s\n",
                        ret_token.line_no, token_str[ret_token.token_type]);
             }
         }
