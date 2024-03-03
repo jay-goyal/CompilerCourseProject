@@ -100,7 +100,7 @@ start_parsing:
             forward += 1;
             int val_len = forward - begin + 1;
             if (val_len < 0) {
-                val_len = TBUF_SIZE - begin + forward;
+                val_len = TBUF_SIZE - begin + forward + 1;
             }
             forward = forward % TBUF_SIZE;
             int tmp = populate_twin_buffers(begin, forward, buffer, &ip_fptr,
@@ -130,7 +130,7 @@ start_parsing:
     forward -= td[curr_state]->retract - 1;
     int val_len = forward - begin + 1;
     if (val_len < 0) {
-        val_len = TBUF_SIZE - begin + forward;
+        val_len = TBUF_SIZE - begin + forward + 1;
     }
     forward = forward % TBUF_SIZE;
     int tmp =
