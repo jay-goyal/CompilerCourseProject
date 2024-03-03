@@ -11,18 +11,21 @@
 #include "transition_diagram.h"
 
 int populate_twin_buffers(int begin, int forward, char* buffer, int* fptr,
-                          int* prev_buf) {
+                          int* prev_buf, bool is_swap) {
     int active = begin / BUF_SIZE;
     int next = forward / BUF_SIZE;
     if (next == *prev_buf || next == active) {
         return -1;
+    }
+    if (is_swap) {
+        return -2;
     }
     *prev_buf = next;
     return read(*fptr, buffer + (BUF_SIZE * next), BUF_SIZE);
 }
 
 void print_lexical_op(int opfptr, tokeninfo_t* tk_info) {
-    char buf[1024];
+    char buf[1224];
     int len;
     len = sprintf(buf, "Line No. %d\t|", tk_info->line_no);
     write(opfptr, buf, len);
@@ -53,6 +56,7 @@ tokeninfo_t get_next_token(char* ip_filename, ht_t* symbol_table,
     static int line_number = 1;
     static int prev_buf = 0;
     tokeninfo_t ret_token = {0, {0}};
+    bool is_swap = false;
     if (!is_lexer_init) {
         buffer = (char*)calloc(TBUF_SIZE, sizeof(char));
         is_lexer_init = true;
@@ -105,8 +109,17 @@ start_parsing:
             }
             forward = forward % TBUF_SIZE;
             int tmp = populate_twin_buffers(begin, forward, buffer, &ip_fptr,
-                                            &prev_buf);
-            if (tmp != -1) res_read = tmp;
+                                            &prev_buf, is_swap);
+            if (tmp == -2) {
+                printf(
+                    "Lexeme greater that 1024 characters exists at line "
+                    "number: %d\n",
+                    line_number);
+            }
+            if (tmp != -1) {
+                res_read = tmp;
+                is_swap = true;
+            }
             char value[val_len];
             value[val_len - 1] = '\0';
             for (int i = 0; i < val_len - 1; i++) {
@@ -124,8 +137,17 @@ start_parsing:
         } else if (!td[curr_state]->is_final) {
             forward = (forward + 1) % TBUF_SIZE;
             int tmp = populate_twin_buffers(begin, forward, buffer, &ip_fptr,
-                                            &prev_buf);
-            if (tmp != -1) res_read = tmp;
+                                            &prev_buf, is_swap);
+            if (tmp == -2) {
+                printf(
+                    "Lexeme greater that 1024 characters exists at line "
+                    "number: %d\n",
+                    line_number);
+            }
+            if (tmp != -1) {
+                res_read = tmp;
+                is_swap = true;
+            }
         }
     }
 
@@ -136,9 +158,18 @@ start_parsing:
         val_len = TBUF_SIZE - begin + forward + 1;
     }
     forward = forward % TBUF_SIZE;
-    int tmp =
-        populate_twin_buffers(begin, forward, buffer, &ip_fptr, &prev_buf);
-    if (tmp != -1) res_read = tmp;
+    int tmp = populate_twin_buffers(begin, forward, buffer, &ip_fptr, &prev_buf,
+                                    is_swap);
+    if (tmp == -2) {
+        printf(
+            "Lexeme greater that 1024 characters exists at line "
+            "number: %d\n",
+            line_number);
+    }
+    if (tmp != -1) {
+        res_read = tmp;
+        is_swap = true;
+    }
 
     char value[val_len];
     value[val_len - 1] = '\0';
