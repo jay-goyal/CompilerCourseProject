@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "hash_table/hash_table.h"
 #include "lexical_analyzer/lexer.h"
@@ -213,28 +214,69 @@ int main(int argc, char* argv[]) {
     ht_t* symbol_table = create_hash_table();
     populate_symbol_table(symbol_table);
 
-    //
-    // tokeninfo_t ret_token = get_next_token(argv[1], symbol_table, argv[2]);
-    // while (ret_token.token_type != -1) {
-    //     if (ret_token.token_type == -2) {
-    //         printf("Lexical error on line number %d\n", ret_token.line_no);
-    //     }
-    //     ret_token = get_next_token(argv[1], symbol_table, argv[2]);
-    // }
+    int op;
+take_input:
+    printf("Input the Operation:\n");
+    scanf("%d", &op);
 
-    // gram_t* gram = create_grammar();
-    //
-    // set_t** first_sets = compute_first_sets(gram);
-    //
-    // set_t** follow_sets = compute_follow_sets(gram, first_sets);
-    //
-    // pt_t pt = create_parse_table(gram, first_sets, follow_sets);
-    //
-    // tree_t* parse_tree = create_parse_tree(pt, argv[1], symbol_table,
-    // argv[2]);
-    //
+    switch (op) {
+        case 0: {
+            return 0;
+        }
+        case 1: {
+            remove_comments(argv[1], argv[2]);
+            break;
+        }
+        case 2: {
+            tokeninfo_t ret_token;
+            do {
+                ret_token = get_next_token(argv[1], symbol_table, argv[2]);
+            } while (ret_token.token_type != -1);
+            break;
+        }
+        case 3: {
+            gram_t* gram = create_grammar();
 
-    remove_comments(argv[1], argv[2]);
+            set_t** first_sets = compute_first_sets(gram);
 
+            set_t** follow_sets = compute_follow_sets(gram, first_sets);
+
+            pt_t pt = create_parse_table(gram, first_sets, follow_sets);
+
+            tree_t* parse_tree =
+                create_parse_tree(pt, argv[1], symbol_table, argv[2]);
+            break;
+        }
+        case 4: {
+            clock_t start_time, end_time;
+            double total_cpu_time, total_cpu_time_in_seconds;
+            start_time = clock();
+
+            gram_t* gram = create_grammar();
+
+            set_t** first_sets = compute_first_sets(gram);
+
+            set_t** follow_sets = compute_follow_sets(gram, first_sets);
+
+            pt_t pt = create_parse_table(gram, first_sets, follow_sets);
+
+            tree_t* parse_tree =
+                create_parse_tree(pt, argv[1], symbol_table, argv[2]);
+
+            end_time = clock();
+            total_cpu_time = (double)(end_time - start_time);
+            total_cpu_time_in_seconds = total_cpu_time / CLOCKS_PER_SEC;
+            printf("Total CPU Time: %f\n", total_cpu_time);
+            printf("Total CPU Time in Seconds: %f\n",
+                   total_cpu_time_in_seconds);
+            break;
+        }
+        default: {
+            printf("Invalid Input\n");
+            goto take_input;
+        }
+    }
+
+    free_hashtable(symbol_table);
     return 0;
 }
