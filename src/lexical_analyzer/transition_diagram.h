@@ -10,6 +10,7 @@ typedef struct Transitions transitions_t;
 typedef struct State state_t;
 
 struct Transitions {
+    int capacity;
     int size;
     char** symbol;
     int* next_state;

@@ -6,6 +6,11 @@ state_t* create_state(int retract, bool exit, bool line_increment,
                       bool is_final) {
     state_t* state = (state_t*)malloc(sizeof(struct State));
     state->transitions.size = 0;
+    state->transitions.capacity = 1;
+    state->transitions.symbol =
+        (char**)calloc(sizeof(char*), state->transitions.capacity);
+    state->transitions.next_state =
+        (int*)calloc(sizeof(int), state->transitions.capacity);
     state->retract = retract;
     state->exit = exit;
     state->line_increment = line_increment;
@@ -14,12 +19,15 @@ state_t* create_state(int retract, bool exit, bool line_increment,
 }
 
 void add_transition(state_t* state, char symbol[], int next_state) {
-    state->transitions.symbol =
-        (char**)realloc(state->transitions.symbol,
-                        (state->transitions.size + 1) * sizeof(char*));
-    state->transitions.next_state =
-        (int*)realloc(state->transitions.next_state,
-                      (state->transitions.size + 1) * sizeof(int));
+    if (state->transitions.capacity < state->transitions.size + 1) {
+        state->transitions.symbol =
+            (char**)realloc(state->transitions.symbol,
+                            (state->transitions.capacity * 2) * sizeof(char*));
+        state->transitions.next_state =
+            (int*)realloc(state->transitions.next_state,
+                          (state->transitions.capacity * 2) * sizeof(int));
+        state->transitions.capacity *= 2;
+    }
     state->transitions.size++;
     state->transitions.symbol[state->transitions.size - 1] =
         (char*)malloc(2 * sizeof(char));

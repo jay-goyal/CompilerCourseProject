@@ -1,8 +1,9 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include "grammar.h"
 #include <stdlib.h>
+
+#include "grammar.h"
 
 typedef struct ParseTable {
     prod_t ***table;
@@ -38,6 +39,7 @@ tnode_t *create_tnode(int val);
 void insert_tnode(tnode_t *parent, tnode_t *child);
 void clear_tnode(tnode_t *node);
 void clear_tree(tree_t *tree);
-tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table);
+tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table,
+                          char *lexer_op_file);
 
 #endif

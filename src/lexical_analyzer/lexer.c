@@ -21,14 +21,32 @@ int populate_twin_buffers(int begin, int forward, char* buffer, int* fptr,
     return read(*fptr, buffer + (BUF_SIZE * next), BUF_SIZE);
 }
 
-tokeninfo_t get_next_token(char* filename, ht_t* symbol_table) {
+void print_lexical_op(int opfptr, tokeninfo_t* tk_info, char* value) {
+    char buf[1024];
+    int len;
+    len = sprintf(buf, "Line No. %d\t|", tk_info->line_no);
+    write(opfptr, buf, len);
+    if (tk_info->token_type == -2) {
+        len = sprintf(buf, "  Lexical error for pattern '%s'\n", value);
+        write(opfptr, buf, len);
+        return;
+    }
+    len = sprintf(buf, "  Token %-20s|", token_str[tk_info->token_type]);
+    write(opfptr, buf, len);
+    len = sprintf(buf, "  Lexeme '%s'\n", value);
+    write(opfptr, buf, len);
+}
+
+tokeninfo_t get_next_token(char* ip_filename, ht_t* symbol_table,
+                           char* op_filename) {
     static unsigned int begin = 0;
     static unsigned int forward = 0;
     static int res_read;
     static bool is_lexer_init = false;
     static bool is_end = false;
     static char* buffer = NULL;
-    static int fptr = -1;
+    static int ip_fptr = -1;
+    static int op_fptr = -1;
     static state_t** td = NULL;
     static int curr_state = 0;
     static int line_number = 1;
@@ -37,9 +55,10 @@ tokeninfo_t get_next_token(char* filename, ht_t* symbol_table) {
     if (!is_lexer_init) {
         buffer = (char*)calloc(TBUF_SIZE, sizeof(char));
         is_lexer_init = true;
-        fptr = open(filename, O_RDONLY);
+        ip_fptr = open(ip_filename, O_RDONLY);
+        op_fptr = open(op_filename, O_RDWR | O_CREAT, 0666);
         td = create_transition_diagram();
-        res_read = read(fptr, buffer, BUF_SIZE);
+        res_read = read(ip_fptr, buffer, BUF_SIZE);
     }
 
     if (res_read < BUF_SIZE && forward % BUF_SIZE >= res_read) {
@@ -48,10 +67,12 @@ tokeninfo_t get_next_token(char* filename, ht_t* symbol_table) {
 
     if (is_end) {
         if (buffer != NULL) free(buffer);
-        if (fptr != -1) close(fptr);
+        if (ip_fptr != -1) close(ip_fptr);
+        if (op_fptr != -1) close(op_fptr);
         if (td != NULL) clear_transition_diagram(td);
         buffer = NULL;
-        fptr = -1;
+        ip_fptr = -1;
+        op_fptr = -1;
         td = NULL;
         ret_token.token_type = -1;
         return ret_token;
@@ -63,10 +84,12 @@ start_parsing:
         if (curr_char == '\0') {
             is_end = true;
             free(buffer);
-            close(fptr);
+            close(ip_fptr);
+            close(op_fptr);
             clear_transition_diagram(td);
             buffer = NULL;
-            fptr = -1;
+            ip_fptr = -1;
+            op_fptr = -1;
             td = NULL;
             ret_token.token_type = -1;
             return ret_token;
@@ -79,8 +102,8 @@ start_parsing:
                 val_len = TBUF_SIZE - begin + forward;
             }
             forward = forward % TBUF_SIZE;
-            int tmp =
-                populate_twin_buffers(begin, forward, buffer, &fptr, &prev_buf);
+            int tmp = populate_twin_buffers(begin, forward, buffer, &ip_fptr,
+                                            &prev_buf);
             if (tmp != -1) res_read = tmp;
             char value[val_len];
             value[val_len - 1] = '\0';
@@ -88,16 +111,16 @@ start_parsing:
                 value[i] = buffer[begin];
                 begin = (begin + 1) % TBUF_SIZE;
             }
-            printf("'%s' -> LEXICAL ERROR at Line Number %d\n", value,
-                   line_number);
             begin = forward;
             curr_state = 0;
             ret_token.token_type = -2;
+            ret_token.line_no = line_number;
+            print_lexical_op(op_fptr, &ret_token, value);
             return ret_token;
         } else if (!td[curr_state]->is_final) {
             forward = (forward + 1) % TBUF_SIZE;
-            int tmp =
-                populate_twin_buffers(begin, forward, buffer, &fptr, &prev_buf);
+            int tmp = populate_twin_buffers(begin, forward, buffer, &ip_fptr,
+                                            &prev_buf);
             if (tmp != -1) res_read = tmp;
         }
     }
@@ -109,7 +132,8 @@ start_parsing:
         val_len = TBUF_SIZE - begin + forward;
     }
     forward = forward % TBUF_SIZE;
-    int tmp = populate_twin_buffers(begin, forward, buffer, &fptr, &prev_buf);
+    int tmp =
+        populate_twin_buffers(begin, forward, buffer, &ip_fptr, &prev_buf);
     if (tmp != -1) res_read = tmp;
 
     char value[val_len];
@@ -158,13 +182,14 @@ start_parsing:
     else {
         is_end = true;
         free(buffer);
-        close(fptr);
+        close(ip_fptr);
         clear_transition_diagram(td);
         buffer = NULL;
-        fptr = -1;
+        ip_fptr = -1;
         td = NULL;
     }
 
     ret_token.line_no = line_number;
+    print_lexical_op(op_fptr, &ret_token, value);
     return ret_token;
 }

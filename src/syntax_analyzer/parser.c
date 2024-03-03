@@ -64,36 +64,36 @@ pt_t create_parse_table(gram_t *gram, set_t **first_sets, set_t **follow_sets) {
     }
 
     for (int i = 0; i < NUM_NONTERMINALS; i++) {
-        if(i == RELATIONALOP-NUM_TERMINALS) {
-
-        for (int j = 1; j <= NUM_TERMINALS + 1; j++) {
-            if (pt.table[i][j] != NULL) {
-                printf("-------------NONTERMINAL %s-------------\n",
-                       non_terminals[i]);
-                if (j <= NUM_TERMINALS)
-                    printf("TERMINAL %s \n", token_str[j - 1]);
-                else
-                    printf("TERMINAL $ \n");
-                int num_right = pt.table[i][j]->num_right;
-                printf("%s -> ", non_terminals[i]);
-                if (num_right == 0) printf("SYNCH");
-                for (int l = 0; l < num_right; l++) {
-                    int right = pt.table[i][j]->right[l];
-                    if (right == -1)
-                        printf("EPSILON ");
-                    else if (right <= NUM_TERMINALS)
-                        printf("%s ", token_str[right]);
+        if (i == RELATIONALOP - NUM_TERMINALS) {
+            for (int j = 1; j <= NUM_TERMINALS + 1; j++) {
+                if (pt.table[i][j] != NULL) {
+                    printf("-------------NONTERMINAL %s-------------\n",
+                           non_terminals[i]);
+                    if (j <= NUM_TERMINALS)
+                        printf("TERMINAL %s \n", token_str[j - 1]);
                     else
-                        printf("%s ", non_terminals[right - NUM_TERMINALS]);
+                        printf("TERMINAL $ \n");
+                    int num_right = pt.table[i][j]->num_right;
+                    printf("%s -> ", non_terminals[i]);
+                    if (num_right == 0) printf("SYNCH");
+                    for (int l = 0; l < num_right; l++) {
+                        int right = pt.table[i][j]->right[l];
+                        if (right == -1)
+                            printf("EPSILON ");
+                        else if (right <= NUM_TERMINALS)
+                            printf("%s ", token_str[right]);
+                        else
+                            printf("%s ", non_terminals[right - NUM_TERMINALS]);
+                    }
+                    printf("\n");
+                    printf("\n");
                 }
-                printf("\n");
-                printf("\n");
             }
-        }
         }
     }
 
-    // printf("%d\n", gram->nonterminals[RELATIONALOP-NUM_TERMINALS]->productions[3]->num_right);
+    // printf("%d\n",
+    // gram->nonterminals[RELATIONALOP-NUM_TERMINALS]->productions[3]->num_right);
     printf("%d\n", pt.table[46][54]->num_right);
     return pt;
 }
@@ -174,7 +174,8 @@ void clear_tree(tree_t *tree) {
     free(tree);
 }
 
-tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table) {
+tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table,
+                          char *lexer_op_file) {
     printf("HEY\n");
     tree_t *parse_tree = create_tree();
     stack_t *stack = create_stack();
@@ -186,10 +187,12 @@ tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table) {
 
     printf("%d\n", pt.table[46][54]->num_right);
 
-    tokeninfo_t ret_token = get_next_token(src_filename, symbol_table);
+    tokeninfo_t ret_token =
+        get_next_token(src_filename, symbol_table, lexer_op_file);
     while (ret_token.token_type != -1) {
         if (ret_token.token_type == -2) {
-            ret_token = get_next_token(src_filename, symbol_table);
+            ret_token =
+                get_next_token(src_filename, symbol_table, lexer_op_file);
         }
 
         if (stack->size == 1) {
@@ -228,7 +231,9 @@ tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table) {
                     printf("Push EPSILON\n");
                     continue;
                 }
-                printf("%d %d %d %d\n", curr_node->val - NUM_TERMINALS, ret_token.token_type + 1, num_right, pt.table[46][54]->num_right);
+                printf("%d %d %d %d\n", curr_node->val - NUM_TERMINALS,
+                       ret_token.token_type + 1, num_right,
+                       pt.table[46][54]->num_right);
                 for (int j = 0; j < num_right; j++) {
                     node = create_tnode(pt.table[curr_node->val - NUM_TERMINALS]
                                                 [ret_token.token_type + 1]
@@ -244,17 +249,20 @@ tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table) {
         else {
             if (curr_node->val == ret_token.token_type) {
                 printf("Pop %s\n", token_str[ret_token.token_type]);
-                ret_token = get_next_token(src_filename, symbol_table);
+                ret_token =
+                    get_next_token(src_filename, symbol_table, lexer_op_file);
             } else {
                 printf("Line No. %d: SYNTAX ERROR!\n", ret_token.line_no);
             }
         }
     }
 
-    ret_token = get_next_token(src_filename, symbol_table);
+    printf("%s\n", token_str[ret_token.token_type]);
+    ret_token = get_next_token(src_filename, symbol_table, lexer_op_file);
     if (ret_token.token_type == -1) {
         printf("Parse Successful\n");
     } else {
+        printf("%s\n", token_str[ret_token.token_type]);
         printf("Lexical Error, Parser could not be run\n");
         exit(-1);
     }
