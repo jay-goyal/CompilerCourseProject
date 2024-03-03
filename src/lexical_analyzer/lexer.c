@@ -55,6 +55,7 @@ tokeninfo_t get_next_token(char* ip_filename, ht_t* symbol_table,
     if (!is_lexer_init) {
         buffer = (char*)calloc(TBUF_SIZE, sizeof(char));
         is_lexer_init = true;
+        fclose(fopen(op_filename, "w"));
         ip_fptr = open(ip_filename, O_RDONLY);
         op_fptr = open(op_filename, O_RDWR | O_CREAT, 0666);
         td = create_transition_diagram();

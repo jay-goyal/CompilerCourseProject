@@ -49,15 +49,15 @@ state_t** create_transition_diagram() {
             i == 42 || i == 44 || i == 51 || i == 60 || i == 63)
             retract++;
         if (i == 60 || i == 63) retract++;
+        if (i == 4 || i == 5 || i == 6 || i == 7 || i == 9 || i == 10 ||
+            i == 17 || i == 18 || i == 22 || i == 25 || i == 28 || i == 31 ||
+            i == 32 || i == 34 || i == 36 || i == 37 || i == 38 || i == 42 ||
+            i == 44 || i == 45 || i == 47 || i == 49 || i == 51 || i == 52 ||
+            i == 53 || i == 54 || i == 55 || i == 56 || i == 57 || i == 58 ||
+            i == 59 || i == 60 || i == 61 || i == 62 || i == 63)
+            is_final = true;
 
         td[i] = create_state(retract, exit, line_increment, is_final);
-    }
-
-    int final_states[35] = {4,  5,  6,  7,  9,  10, 17, 18, 22, 25, 28, 31,
-                            32, 34, 36, 37, 38, 42, 44, 45, 47, 49, 51, 52,
-                            53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63};
-    for (int i = 0; i < 35; i++) {
-        td[final_states[i]]->is_final = true;
     }
 
     // Return Values
