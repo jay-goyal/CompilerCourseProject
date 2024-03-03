@@ -212,6 +212,7 @@ int main(int argc, char* argv[]) {
     }
     ht_t* symbol_table = create_hash_table();
     populate_symbol_table(symbol_table);
+
     //
     // tokeninfo_t ret_token = get_next_token(argv[1], symbol_table, argv[2]);
     // while (ret_token.token_type != -1) {
@@ -221,15 +222,19 @@ int main(int argc, char* argv[]) {
     //     ret_token = get_next_token(argv[1], symbol_table, argv[2]);
     // }
 
-    gram_t* gram = create_grammar();
+    // gram_t* gram = create_grammar();
+    //
+    // set_t** first_sets = compute_first_sets(gram);
+    //
+    // set_t** follow_sets = compute_follow_sets(gram, first_sets);
+    //
+    // pt_t pt = create_parse_table(gram, first_sets, follow_sets);
+    //
+    // tree_t* parse_tree = create_parse_tree(pt, argv[1], symbol_table,
+    // argv[2]);
+    //
 
-    set_t** first_sets = compute_first_sets(gram);
-
-    set_t** follow_sets = compute_follow_sets(gram, first_sets);
-
-    pt_t pt = create_parse_table(gram, first_sets, follow_sets);
-
-    tree_t* parse_tree = create_parse_tree(pt, argv[1], symbol_table, argv[2]);
+    remove_comments(argv[1], argv[2]);
 
     return 0;
 }

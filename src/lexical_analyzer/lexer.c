@@ -194,3 +194,21 @@ start_parsing:
     print_lexical_op(op_fptr, &ret_token, value);
     return ret_token;
 }
+
+void remove_comments(char* ipfile, char* opfile) {
+    bool is_comment = false;
+    FILE* fin = fopen(ipfile, "r");
+    FILE* fout = fopen(opfile, "w+");
+    char c = fgetc(fin);
+
+    while (c != EOF) {
+        if (c == '%')
+            is_comment = true;
+        else if (c == '\n')
+            is_comment = false;
+
+        if (!is_comment) fputc(c, fout);
+
+        c = fgetc(fin);
+    }
+}

@@ -207,7 +207,7 @@ tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table,
             else if (pt.table[curr_node->val - NUM_TERMINALS]
                              [ret_token.token_type + 1]
                                  ->num_right == 0) {
-                pop(stack);
+                // pop(stack);
                 pop(stack);
                 printf("Line No. %d: SYNTAX ERROR! at token type %s\n",
                        ret_token.line_no, token_str[ret_token.token_type]);
@@ -247,7 +247,8 @@ tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table,
                 ret_token =
                     get_next_token(src_filename, symbol_table, lexer_op_file);
             } else {
-                printf("Line No. %d: SYNTAX ERROR! Token: %s\n", ret_token.line_no, token_str[ret_token.token_type]);
+                printf("Line No. %d: SYNTAX ERROR! Token: %s\n",
+                       ret_token.line_no, token_str[ret_token.token_type]);
             }
         }
     }

@@ -11,6 +11,6 @@
 
 tokeninfo_t get_next_token(char* ip_filename, ht_t* symbol_table,
                            char* op_filename);
-void remove_comments(FILE* fin, FILE* fout);
+void remove_comments(char* fin, char* fout);
 
 #endif  // !LEXER_H
