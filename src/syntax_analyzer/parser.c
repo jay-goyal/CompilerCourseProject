@@ -202,20 +202,25 @@ tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table,
         // printf("After Top\n");
         printf("Top: %d, Size: %d\n", top(stack)->val, stack->size);
         tnode_t *curr_node = top(stack);
-        pop(stack);
         if (curr_node->val >= NUM_TERMINALS) {
             // error -> skip
             if (pt.table[curr_node->val - NUM_TERMINALS]
                         [ret_token.token_type + 1] == NULL) {
-                printf("Line No. %d: SYNTAX ERROR!\n", ret_token.line_no);
+                printf("Line No. %d: SYNTAX ERROR! at token type %s\n",
+                       ret_token.line_no, token_str[ret_token.token_type]);
+                ret_token =
+                    get_next_token(src_filename, symbol_table, lexer_op_file);
             }
             // synch -> error recovery
             else if (pt.table[curr_node->val - NUM_TERMINALS]
                              [ret_token.token_type + 1]
                                  ->num_right == 0) {
                 pop(stack);
-                printf("Line No. %d: SYNTAX ERROR!\n", ret_token.line_no);
+                pop(stack);
+                printf("Line No. %d: SYNTAX ERROR! at token type %s\n",
+                       ret_token.line_no, token_str[ret_token.token_type]);
             } else {
+                pop(stack);
                 printf("Pop %s\n",
                        non_terminals[curr_node->val - NUM_TERMINALS]);
                 int num_right = pt.table[curr_node->val - NUM_TERMINALS]
@@ -247,6 +252,7 @@ tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table,
         }
         // top is a terminal
         else {
+            pop(stack);
             if (curr_node->val == ret_token.token_type) {
                 printf("Pop %s\n", token_str[ret_token.token_type]);
                 ret_token =
