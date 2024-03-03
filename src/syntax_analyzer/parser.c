@@ -256,13 +256,14 @@ tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table,
             }
         }
     }
-
-    printf("%s\n", token_str[ret_token.token_type]);
+    if (ret_token.token_type >= 0)
+        printf("%s\n", token_str[ret_token.token_type]);
     ret_token = get_next_token(src_filename, symbol_table, lexer_op_file);
     if (ret_token.token_type == -1) {
         printf("Parse Successful\n");
     } else {
-        printf("%s\n", token_str[ret_token.token_type]);
+        if (ret_token.token_type >= 0)
+            printf("%s\n", token_str[ret_token.token_type]);
         printf("Lexical Error, Parser could not be run\n");
         exit(-1);
     }
