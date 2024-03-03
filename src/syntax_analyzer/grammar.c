@@ -349,6 +349,8 @@ void populate_productions(gram_t *gram) {
     nonterm = add_nonterminal(gram, ACTUALORREDEFINED);
     prod = create_production();
     add_right(prod, TYPEDEFINITION, ACTUALORREDEFINED);
+    add_production(nonterm, prod);
+    prod = create_production();
     add_right(prod, DEFINETYPESTMT, ACTUALORREDEFINED);
     add_production(nonterm, prod);
 
