@@ -202,17 +202,27 @@ start_parsing:
 
 void remove_comments(char* ipfile, char* opfile) {
     bool is_comment = false;
+    bool is_new_line = true;
     FILE* fin = fopen(ipfile, "r");
     FILE* fout = fopen(opfile, "w+");
     char c = fgetc(fin);
 
     while (c != EOF) {
-        if (c == '%')
+        if (c == '%') {
             is_comment = true;
-        else if (c == '\n')
-            is_comment = false;
+            if (!is_new_line) {
+                fputc('\n', fout);
+            }
+        }
 
         if (!is_comment) fputc(c, fout);
+
+        if (c == '\n') {
+            is_comment = false;
+            is_new_line = true;
+        } else {
+            is_new_line = false;
+        }
 
         c = fgetc(fin);
     }
