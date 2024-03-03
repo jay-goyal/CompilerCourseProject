@@ -245,6 +245,7 @@ take_input:
 
             tree_t* parse_tree =
                 create_parse_tree(pt, argv[1], symbol_table, argv[2]);
+            print_parse_tree(parse_tree, argv[2]);
             break;
         }
         case 4: {
