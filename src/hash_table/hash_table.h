@@ -5,7 +5,7 @@
 #include "../lexical_analyzer/lexer_types.h"
 #include "../linked_list/LinkedList.h"
 
-#define TABLE_SIZE 10000
+#define TABLE_SIZE 1000
 // #define TABLE_SIZE 7
 typedef struct HashTable {
     node_t** entries;

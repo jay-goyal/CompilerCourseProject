@@ -34,11 +34,10 @@ bool is_empty(stack_t *stack);
 void clear_stack(stack_t *stack);
 
 tree_t *create_tree();
-void insert_tree(tree_t *tree, tnode_t *node);
 tnode_t *create_tnode(int val);
 void insert_tnode(tnode_t *parent, tnode_t *child);
 void clear_tnode(tnode_t *node);
 void clear_tree(tree_t *tree);
-tree_t *create_parse_tree(int *input, int len, pt_t pt);
+tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table);
 
 #endif

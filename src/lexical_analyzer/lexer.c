@@ -165,5 +165,6 @@ start_parsing:
         td = NULL;
     }
 
+    ret_token.line_no = line_number;
     return ret_token;
 }

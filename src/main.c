@@ -210,58 +210,47 @@ int main(int argc, char* argv[]) {
         printf("Provide the filename for the testcase");
         return -1;
     }
-
     ht_t* symbol_table = create_hash_table();
     populate_symbol_table(symbol_table);
 
-    // gram_t* gram = create_grammar();
-    //
-    // set_t **first_sets = compute_first_sets(gram);
-    //
-    // set_t **follow_sets = compute_follow_sets(gram, first_sets);
-    //
-    // pt_t pt = create_parse_table(gram, first_sets, follow_sets);
-    //
-    // int *input = (int *)calloc(4, sizeof(int));
-    // input[0] = TK_MAIN;
-    // input[1] = TK_RETURN;
-    // input[2] = TK_SEM;
-    // input[3] = TK_END;
-    // tree_t* parse_tree = create_parse_tree(input, 4, pt);
-    //
+    // tokeninfo_t ret_token = get_next_token(argv[1], symbol_table);
+    // while (ret_token.token_type != -1) {
+    //     switch (ret_token.token_type) {
+    //         case TK_NUM:
+    //             printf("%ld -> %s\n", ret_token.info.num_val,
+    //                    token_str[TK_NUM]);
+    //             break;
+    //         case TK_RNUM:
+    //             printf("%f -> %s\n", ret_token.info.rnum_val,
+    //                    token_str[TK_RNUM]);
+    //             break;
+    //         case TK_FUNID:
+    //         case TK_FIELDID:
+    //         case TK_ID:
+    //         case TK_RUID:
+    //             printf("%s -> %s\n", ret_token.info.stentry->lexeme,
+    //                    token_str[ret_token.token_type]);
+    //             break;
+    //         case -1:
+    //         case -2:
+    //             break;
+    //         default:
+    //             printf("%s\n", token_str[ret_token.token_type]);
+    //             break;
+    //     }
+    //     ret_token = get_next_token(argv[1], symbol_table);
+    // }
 
-    tokeninfo_t ret_token = get_next_token(argv[1], symbol_table);
-    while (ret_token.token_type != -1) {
-        switch (ret_token.token_type) {
-            case TK_NUM:
-                printf("%ld -> %s\n", ret_token.info.num_val,
-                       token_str[TK_NUM]);
-                break;
-            case TK_RNUM:
-                printf("%f -> %s\n", ret_token.info.rnum_val,
-                       token_str[TK_RNUM]);
-                break;
-            case TK_FUNID:
-            case TK_FIELDID:
-            case TK_ID:
-            case TK_RUID:
-                printf("%s -> %s\n", ret_token.info.stentry->lexeme,
-                       token_str[ret_token.token_type]);
-                break;
-            case -1:
-            case -2:
-                break;
-            default:
-                printf("%s\n", token_str[ret_token.token_type]);
-                break;
-        }
-        ret_token = get_next_token("test.txt", symbol_table);
-    }
+    
+    gram_t* gram = create_grammar();
+    
+    set_t **first_sets = compute_first_sets(gram);
+    
+    set_t **follow_sets = compute_follow_sets(gram, first_sets);
+    
+    pt_t pt = create_parse_table(gram, first_sets, follow_sets);
 
-    // clear_grammar(gram);
-    // clear_sets(first_sets);
-    // clear_sets(follow_sets);
-    // printf("%d")
+    tree_t* parse_tree = create_parse_tree(pt, argv[1], symbol_table);
 
     return 0;
 }

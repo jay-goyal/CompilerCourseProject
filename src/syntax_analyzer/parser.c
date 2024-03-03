@@ -64,6 +64,8 @@ pt_t create_parse_table(gram_t *gram, set_t **first_sets, set_t **follow_sets) {
     }
 
     for (int i = 0; i < NUM_NONTERMINALS; i++) {
+        if(i == RELATIONALOP-NUM_TERMINALS) {
+
         for (int j = 1; j <= NUM_TERMINALS + 1; j++) {
             if (pt.table[i][j] != NULL) {
                 printf("-------------NONTERMINAL %s-------------\n",
@@ -88,7 +90,11 @@ pt_t create_parse_table(gram_t *gram, set_t **first_sets, set_t **follow_sets) {
                 printf("\n");
             }
         }
+        }
     }
+
+    // printf("%d\n", gram->nonterminals[RELATIONALOP-NUM_TERMINALS]->productions[3]->num_right);
+    printf("%d\n", pt.table[46][54]->num_right);
     return pt;
 }
 
@@ -138,8 +144,6 @@ tree_t *create_tree() {
     return tree;
 }
 
-void insert_tree(tree_t *tree, tnode_t *node) { tree->root = node; }
-
 tnode_t *create_tnode(int val) {
     tnode_t *node = (tnode_t *)malloc(sizeof(tnode_t));
     node->val = val;
@@ -170,7 +174,8 @@ void clear_tree(tree_t *tree) {
     free(tree);
 }
 
-tree_t *create_parse_tree(int *input, int len, pt_t pt) {
+tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table) {
+    printf("HEY\n");
     tree_t *parse_tree = create_tree();
     stack_t *stack = create_stack();
     tnode_t *node = create_tnode(BOTTOMMARKER);
@@ -179,61 +184,79 @@ tree_t *create_parse_tree(int *input, int len, pt_t pt) {
     push(stack, node);
     parse_tree->root = node;
 
-    int i = 0;
+    printf("%d\n", pt.table[46][54]->num_right);
 
-    while (stack->size > 1) {
+    tokeninfo_t ret_token = get_next_token(src_filename, symbol_table);
+    while (ret_token.token_type != -1) {
+        if (ret_token.token_type == -2) {
+            ret_token = get_next_token(src_filename, symbol_table);
+        }
+
+        if (stack->size == 1) {
+            break;
+        }
+        printf("Before Top\n");
+        // printf("After Top\n");
+        printf("Top: %d, Size: %d\n", top(stack)->val, stack->size);
         tnode_t *curr_node = top(stack);
         pop(stack);
-        // top is a non terminal
         if (curr_node->val >= NUM_TERMINALS) {
             // error -> skip
-            if (pt.table[curr_node->val - NUM_TERMINALS][input[i] + 1] ==
-                NULL) {
-                printf("SYNTAX ERROR!\n");
+            if (pt.table[curr_node->val - NUM_TERMINALS]
+                        [ret_token.token_type + 1] == NULL) {
+                printf("Line No. %d: SYNTAX ERROR!\n", ret_token.line_no);
             }
             // synch -> error recovery
-            else if (pt.table[curr_node->val - NUM_TERMINALS][input[i] + 1]
-                         ->num_right == 0) {
+            else if (pt.table[curr_node->val - NUM_TERMINALS]
+                             [ret_token.token_type + 1]
+                                 ->num_right == 0) {
                 pop(stack);
-                printf("SYNTAX ERROR!\n");
+                printf("Line No. %d: SYNTAX ERROR!\n", ret_token.line_no);
             } else {
                 printf("Pop %s\n",
                        non_terminals[curr_node->val - NUM_TERMINALS]);
-                int num_right =
-                    pt.table[curr_node->val - NUM_TERMINALS][input[i] + 1]
-                        ->num_right;
-                if (num_right == 1 &&
-                    pt.table[curr_node->val - NUM_TERMINALS][input[i] + 1]
-                            ->right[0] == -1) {
+                int num_right = pt.table[curr_node->val - NUM_TERMINALS]
+                                        [ret_token.token_type + 1]
+                                            ->num_right;
+                if (num_right == 1 && pt.table[curr_node->val - NUM_TERMINALS]
+                                              [ret_token.token_type + 1]
+                                                  ->right[0] == -1) {
+                    node = create_tnode(pt.table[curr_node->val - NUM_TERMINALS]
+                                                [ret_token.token_type + 1]
+                                                    ->right[0]);
+                    insert_tnode(curr_node, node);
+                    printf("Push EPSILON\n");
                     continue;
                 }
+                printf("%d %d %d %d\n", curr_node->val - NUM_TERMINALS, ret_token.token_type + 1, num_right, pt.table[46][54]->num_right);
                 for (int j = 0; j < num_right; j++) {
-                    node = create_tnode(
-                        pt.table[curr_node->val - NUM_TERMINALS][input[i] + 1]
-                            ->right[j]);
+                    node = create_tnode(pt.table[curr_node->val - NUM_TERMINALS]
+                                                [ret_token.token_type + 1]
+                                                    ->right[j]);
                     insert_tnode(curr_node, node);
                 }
                 for (int j = num_right - 1; j >= 0; j--) {
                     push(stack, curr_node->children[j]);
-                    if (curr_node->children[j]->val >= NUM_TERMINALS) {
-                        printf("Push %s\n",
-                               non_terminals[curr_node->children[j]->val -
-                                             NUM_TERMINALS]);
-                    } else {
-                        printf("Push %s\n",
-                               token_str[curr_node->children[j]->val]);
-                    }
                 }
             }
         }
         // top is a terminal
         else {
-            if (curr_node->val == input[i]) {
-                i++;
+            if (curr_node->val == ret_token.token_type) {
+                printf("Pop %s\n", token_str[ret_token.token_type]);
+                ret_token = get_next_token(src_filename, symbol_table);
             } else {
-                printf("SYNTAX ERROR!\n");
+                printf("Line No. %d: SYNTAX ERROR!\n", ret_token.line_no);
             }
         }
+    }
+
+    ret_token = get_next_token(src_filename, symbol_table);
+    if (ret_token.token_type == -1) {
+        printf("Parse Successful\n");
+    } else {
+        printf("Lexical Error, Parser could not be run\n");
+        exit(-1);
     }
 
     return parse_tree;

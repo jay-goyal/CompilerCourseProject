@@ -87,6 +87,7 @@ typedef struct TokenInfo {
         double rnum_val;
         unsigned long num_val;
     } info;
+    int line_no;
 } tokeninfo_t;
 
 #endif  // !COMPILER_TYPES_H
