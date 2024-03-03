@@ -21,19 +21,20 @@ int populate_twin_buffers(int begin, int forward, char* buffer, int* fptr,
     return read(*fptr, buffer + (BUF_SIZE * next), BUF_SIZE);
 }
 
-void print_lexical_op(int opfptr, tokeninfo_t* tk_info, char* value) {
+void print_lexical_op(int opfptr, tokeninfo_t* tk_info) {
     char buf[1024];
     int len;
     len = sprintf(buf, "Line No. %d\t|", tk_info->line_no);
     write(opfptr, buf, len);
     if (tk_info->token_type == -2) {
-        len = sprintf(buf, "  Lexical error for pattern '%s'\n", value);
+        len =
+            sprintf(buf, "  Lexical error for pattern '%s'\n", tk_info->lexeme);
         write(opfptr, buf, len);
         return;
     }
     len = sprintf(buf, "  Token %-20s|", token_str[tk_info->token_type]);
     write(opfptr, buf, len);
-    len = sprintf(buf, "  Lexeme '%s'\n", value);
+    len = sprintf(buf, "  Lexeme '%s'\n", tk_info->lexeme);
     write(opfptr, buf, len);
 }
 
@@ -116,7 +117,9 @@ start_parsing:
             curr_state = 0;
             ret_token.token_type = -2;
             ret_token.line_no = line_number;
-            print_lexical_op(op_fptr, &ret_token, value);
+            ret_token.lexeme = (char*)malloc(sizeof(char) * val_len);
+            strcpy(ret_token.lexeme, value);
+            print_lexical_op(op_fptr, &ret_token);
             return ret_token;
         } else if (!td[curr_state]->is_final) {
             forward = (forward + 1) % TBUF_SIZE;
@@ -191,7 +194,9 @@ start_parsing:
     }
 
     ret_token.line_no = line_number;
-    print_lexical_op(op_fptr, &ret_token, value);
+    ret_token.lexeme = (char*)malloc(sizeof(char) * val_len);
+    strcpy(ret_token.lexeme, value);
+    print_lexical_op(op_fptr, &ret_token);
     return ret_token;
 }
 

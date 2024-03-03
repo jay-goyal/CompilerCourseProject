@@ -277,6 +277,5 @@ take_input:
         }
     }
 
-    free_hashtable(symbol_table);
     return 0;
 }
