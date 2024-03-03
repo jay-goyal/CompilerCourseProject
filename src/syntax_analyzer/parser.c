@@ -276,23 +276,23 @@ void print_node(tnode_t *node, int fptr) {
     // leaf node
     if (num_children == 0) {
         if (node->val == -1) {
-            len = sprintf(buf, "---- %d EPSILON ---- %s yes ----\n",
+            len = sprintf(buf, "----                 %-4d   EPSILON          ----          %-30s yes      ----\n",
                           node->tokeninfo.line_no,
                           non_terminals[node->parent->val - NUM_TERMINALS]);
             write(fptr, buf, len);
         } else {
-            len = sprintf(buf, "%s %d %s", node->tokeninfo.lexeme,
+            len = sprintf(buf, "%-20s %-4d   %-16s", node->tokeninfo.lexeme,
                           node->tokeninfo.line_no,
                           token_str[node->tokeninfo.token_type]);
             write(fptr, buf, len);
             if (node->tokeninfo.token_type == TK_NUM)
-                len = sprintf(buf, " %ld", node->tokeninfo.info.num_val);
+                len = sprintf(buf, " %-7ld", node->tokeninfo.info.num_val);
             else if (node->tokeninfo.token_type == TK_NUM)
-                len = sprintf(buf, " %f", node->tokeninfo.info.rnum_val);
+                len = sprintf(buf, " %-7f", node->tokeninfo.info.rnum_val);
             else
-                len = sprintf(buf, " ----");
+                len = sprintf(buf, " ----   ");
             write(fptr, buf, len);
-            len = sprintf(buf, " %s yes ----\n",
+            len = sprintf(buf, "       %-30s yes      ----\n",
                           non_terminals[node->parent->val - NUM_TERMINALS]);
             write(fptr, buf, len);
         }
@@ -300,19 +300,16 @@ void print_node(tnode_t *node, int fptr) {
     }
 
     print_node(node->children[0], fptr);
-    // printf("---- %d ---- ---- %s no %s\n", node->tokeninfo.line_no,
-    // non_terminals[node->parent->val-NUM_TERMINALS]
-    // ,non_terminals[node->val-NUM_TERMINALS]);
-    len = sprintf(buf, "---- %d ---- ----", node->tokeninfo.line_no);
+    len = sprintf(buf, "----                 %-4d   ----             ----   ", node->tokeninfo.line_no);
     write(fptr, buf, len);
     if (node->val == PROGRAM) {
-        len = sprintf(buf, " ROOT");
+        len = sprintf(buf, "       ROOT                          ");
         write(fptr, buf, len);
     } else {
-        len = sprintf(buf, " %s", non_terminals[node->val - NUM_TERMINALS]);
+        len = sprintf(buf, "       %-30s", non_terminals[node->val - NUM_TERMINALS]);
         write(fptr, buf, len);
     }
-    len = sprintf(buf, " no %s\n", non_terminals[node->val - NUM_TERMINALS]);
+    len = sprintf(buf, " no       %s\n", non_terminals[node->val - NUM_TERMINALS]);
     write(fptr, buf, len);
 
     for (int i = 1; i < num_children; i++) {
@@ -322,6 +319,9 @@ void print_node(tnode_t *node, int fptr) {
 
 void print_parse_tree(tree_t *tree, char *parser_op_file) {
     int fptr = open(parser_op_file, O_RDWR | O_CREAT, 0666);
+    char buf[1500];
+    int len = sprintf(buf, "Lexeme               LineNo TokenName        ValueIfNumber Parent                         isLeaf   Node\n");
+    write(fptr, buf, len);
     print_node(tree->root, fptr);
     close(fptr);
 }
