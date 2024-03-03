@@ -464,23 +464,12 @@ void populate_productions(gram_t *gram) {
     add_production(nonterm, prod);
 
     nonterm = add_nonterminal(gram, SINGLEORRECID);
-    // prod = create_production();
-    // add_right(prod, TK_ID, SINGLEORRECID);
-    // add_production(nonterm, prod);
-    // prod = create_production();
-    // add_right(prod, CONSTRUCTEDVARIABLE, SINGLEORRECID);
-    // add_production(nonterm, prod);
     prod = create_production();
     add_right(prod, TK_ID, SINGLEORRECID);
     add_right(prod, OPTION_SINGLE_CONSTRUCTED, SINGLEORRECID);
     add_production(nonterm, prod);
 
     nonterm = add_nonterminal(gram, CONSTRUCTEDVARIABLE);
-    // prod = create_production();
-    // add_right(prod, TK_ID, CONSTRUCTEDVARIABLE);
-    // add_right(prod, ONEEXPANSION, CONSTRUCTEDVARIABLE);
-    // add_right(prod, MOREEXPANSIONS, CONSTRUCTEDVARIABLE);
-    // add_production(nonterm, prod);
 
     nonterm = add_nonterminal(gram, ONEEXPANSION);
     prod = create_production();
@@ -547,16 +536,6 @@ void populate_productions(gram_t *gram) {
     add_production(nonterm, prod);
 
     nonterm = add_nonterminal(gram, CONDITIONALSTMT);
-    prod = create_production();
-    add_right(prod, TK_IF, CONDITIONALSTMT);
-    add_right(prod, BOOLEANEXPRESSION, CONDITIONALSTMT);
-    add_right(prod, TK_THEN, CONDITIONALSTMT);
-    add_right(prod, STMT, CONDITIONALSTMT);
-    add_right(prod, OTHERSTMTS, CONDITIONALSTMT);
-    add_right(prod, TK_ELSE, CONDITIONALSTMT);
-    add_right(prod, OTHERSTMTS, CONDITIONALSTMT);
-    add_right(prod, TK_ENDIF, CONDITIONALSTMT);
-    add_production(nonterm, prod);
     prod = create_production();
     add_right(prod, TK_IF, CONDITIONALSTMT);
     add_right(prod, TK_OP, CONDITIONALSTMT);
