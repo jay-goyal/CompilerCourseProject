@@ -198,36 +198,35 @@ start_parsing:
     if (td[curr_state]->line_increment) line_number++;
 
     if (token >= 0 && token != TK_COMMENT) {
-        if (val_len > 20) {
-            ret_token.token_type = -3;
-        } else {
-            ret_token.token_type = token;
-            switch (token) {
-                case TK_NUM:
-                    ret_token.info.num_val = atol(value);
-                    break;
-                case TK_RNUM:
-                    ret_token.info.rnum_val = atof(value);
-                    break;
-                case TK_FUNID:
-                case TK_FIELDID:
-                case TK_ID:
-                case TK_RUID: {
-                    char* val_heap = (char*)calloc(val_len, sizeof(char));
-                    strcpy(val_heap, value);
-                    stentry_t* entry = (stentry_t*)calloc(1, sizeof(stentry_t));
-                    entry->lexeme = val_heap;
-                    entry->token_type = token;
-                    stentry_t* existing_entry =
-                        insert_entry(symbol_table, entry);
-                    if (existing_entry != NULL) {
-                        free(entry);
-                        entry = existing_entry;
-                    }
-                    ret_token.token_type = entry->token_type;
-                    ret_token.info.stentry = entry;
+        ret_token.token_type = token;
+        switch (token) {
+            case TK_NUM:
+                ret_token.info.num_val = atol(value);
+                break;
+            case TK_RNUM:
+                ret_token.info.rnum_val = atof(value);
+                break;
+            case TK_FUNID:
+            case TK_FIELDID:
+            case TK_ID:
+            case TK_RUID: {
+                if (val_len > 20) {
+                    ret_token.token_type = -3;
                     break;
                 }
+                char* val_heap = (char*)calloc(val_len, sizeof(char));
+                strcpy(val_heap, value);
+                stentry_t* entry = (stentry_t*)calloc(1, sizeof(stentry_t));
+                entry->lexeme = val_heap;
+                entry->token_type = token;
+                stentry_t* existing_entry = insert_entry(symbol_table, entry);
+                if (existing_entry != NULL) {
+                    free(entry);
+                    entry = existing_entry;
+                }
+                ret_token.token_type = entry->token_type;
+                ret_token.info.stentry = entry;
+                break;
             }
         }
     } else {
