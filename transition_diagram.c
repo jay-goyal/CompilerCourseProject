@@ -1,6 +1,6 @@
 #include "transition_diagram.h"
 
-#include "lexer_types.h"
+#include "lexerDef.h"
 
 state_t* create_state(int retract, bool exit, bool line_increment,
                       bool is_final) {

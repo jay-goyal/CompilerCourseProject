@@ -6,7 +6,7 @@
 #include "hash_table.h"
 #include "helper.h"
 #include "lexer.h"
-#include "lexer_types.h"
+#include "lexerDef.h"
 #include "parser.h"
 
 int main(int argc, char* argv[]) {

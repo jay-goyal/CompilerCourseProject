@@ -9,7 +9,7 @@
 #include <unistd.h>
 
 #include "helper.h"
-#include "lexer_types.h"
+#include "lexerDef.h"
 #include "transition_diagram.h"
 
 int populate_twin_buffers(int begin, int forward, char* buffer, int* fptr,

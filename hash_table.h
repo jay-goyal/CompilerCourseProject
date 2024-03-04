@@ -3,7 +3,7 @@
 #include <stdbool.h>
 
 #include "LinkedList.h"
-#include "lexer_types.h"
+#include "lexerDef.h"
 
 #define TABLE_SIZE 1000
 // #define TABLE_SIZE 7

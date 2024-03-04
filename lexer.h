@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 #include "hash_table.h"
-#include "lexer_types.h"
+#include "lexerDef.h"
 
 #define BUF_SIZE 512
 #define TBUF_SIZE (BUF_SIZE * 2)

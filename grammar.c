@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 
-#include "lexer_types.h"
+#include "lexerDef.h"
 
 bool visited[NUM_NONTERMINALS] = {0};
 int occur[NUM_NONTERMINALS][NUM_NONTERMINALS] = {{0}};

@@ -1,7 +1,7 @@
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H
 
-#include "lexer_types.h"
+#include "lexerDef.h"
 
 typedef struct Node {
     stentry_t* key;

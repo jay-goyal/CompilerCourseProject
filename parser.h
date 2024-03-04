@@ -4,28 +4,7 @@
 #include <stdlib.h>
 
 #include "grammar.h"
-
-typedef struct ParseTable {
-    prod_t ***table;
-} pt_t;
-
-typedef struct Treetnode tnode_t;
-struct Treetnode {
-    int val;
-    int num_children;
-    tokeninfo_t tokeninfo;
-    tnode_t **children;
-    tnode_t *parent;
-};
-
-typedef struct Tree {
-    tnode_t *root;
-} tree_t;
-
-typedef struct Stack {
-    int size;
-    tnode_t **nodes;
-} stack_t;
+#include "parserDef.h"
 
 pt_t create_parse_table(gram_t *gram, set_t **first_sets, set_t **follow_sets);
 
