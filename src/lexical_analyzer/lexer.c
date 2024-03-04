@@ -198,7 +198,7 @@ start_parsing:
     if (td[curr_state]->line_increment) line_number++;
 
     if (token >= 0 && token != TK_COMMENT) {
-        if (token == TK_ID && val_len > 20) {
+        if (val_len > 20) {
             ret_token.token_type = -3;
         } else {
             ret_token.token_type = token;
