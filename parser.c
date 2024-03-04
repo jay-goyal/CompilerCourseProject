@@ -91,6 +91,14 @@ pt_t createParseTable(gram_t *gram, set_t **first_sets, set_t **follow_sets) {
     return pt;
 }
 
+void clear_parse_table(pt_t pt) {
+    free(pt.table[0][TK_SEM + 1]);
+    for(int i=0; i<NUM_NONTERMINALS; i++) {
+        free(pt.table[i]);
+    }
+    free(pt.table);
+}
+
 /* STACK */
 stack_t *create_stack() {
     stack_t *stack = (stack_t *)malloc(sizeof(stack_t));

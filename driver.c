@@ -12,6 +12,7 @@ ARYAN BANSAL - 2021A7PS2776P
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
+
 #include "grammar.h"
 #include "hash_table.h"
 #include "helper.h"
@@ -20,13 +21,13 @@ ARYAN BANSAL - 2021A7PS2776P
 #include "parser.h"
 
 int main(int argc, char* argv[]) {
-    //Check for the number of arguments 
+    // Check for the number of arguments
     if (argc != 3) {
         printf("Invalid number of arguments. Expected 3 got %d\n", argc);
         exit(-1);
     }
 
-    //Check if the input file exists
+    // Check if the input file exists
     if (access(argv[1], F_OK) == -1) {
         printf(ANSI_COLOR_RED ANSI_COLOR_BOLD
                "File %s does not exist\n" ANSI_COLOR_RESET,
@@ -34,9 +35,7 @@ int main(int argc, char* argv[]) {
         exit(-1);
     }
 
-    //Create Symbol Table
-    ht_t* symbol_table = create_hash_table();
-    populate_symbol_table(symbol_table);
+    // Create Symbol Table
 
     // Print Status of Submission
     printf(
@@ -79,11 +78,13 @@ take_input:
         // Remove Comments
         case 1: {
             removeComments(argv[1]);
-            break;
+            goto take_input;
         }
 
         // Lexical Analysis
         case 2: {
+            ht_t* symbol_table = create_hash_table();
+            populate_symbol_table(symbol_table);
             tokeninfo_t ret_token;
             bool err_flag = false;
             do {
@@ -97,11 +98,15 @@ take_input:
                 printf(ANSI_COLOR_GREEN ANSI_COLOR_BOLD
                        "\n\nLexical Analysis Finished. No Errors "
                        "Reported\n\n" ANSI_COLOR_RESET);
-            break;
+            free_hashtable(symbol_table);
+            goto take_input;
         }
 
         // Lexical, Syntax Analysis and Print Parse Tree
         case 3: {
+            ht_t* symbol_table = create_hash_table();
+            populate_symbol_table(symbol_table);
+
             gram_t* gram = create_grammar();
 
             set_t** first_sets = computeFirstSets(gram);
@@ -113,14 +118,20 @@ take_input:
             tree_t* parse_tree =
                 parseInputSourceCode(pt, argv[1], symbol_table);
             printParseTree(parse_tree, argv[2]);
-            break;
+
+            free_hashtable(symbol_table);
+            clear_grammar(gram);
+            clear_parse_table(pt);
+            clear_sets(first_sets);
+            clear_sets(follow_sets);
+            clear_tree(parse_tree);
+            goto take_input;
         }
 
         // Time the Lexical, Syntax Analysis and Print Parse Tree
         case 4: {
-            clock_t start_time, end_time;
-            double total_cpu_time, total_cpu_time_in_seconds;
-            start_time = clock();
+            ht_t* symbol_table = create_hash_table();
+            populate_symbol_table(symbol_table);
 
             gram_t* gram = create_grammar();
 
@@ -130,14 +141,18 @@ take_input:
 
             pt_t pt = createParseTable(gram, first_sets, follow_sets);
 
+            clock_t start_time, end_time;
+            double total_cpu_time, total_cpu_time_in_seconds;
+            start_time = clock();
+
             tree_t* parse_tree =
                 parseInputSourceCode(pt, argv[1], symbol_table);
-
-            printParseTree(parse_tree, argv[2]);
 
             end_time = clock();
             total_cpu_time = (double)(end_time - start_time);
             total_cpu_time_in_seconds = total_cpu_time / CLOCKS_PER_SEC;
+
+            printParseTree(parse_tree, argv[2]);
             printf(ANSI_COLOR_GREEN ANSI_COLOR_BOLD
                    "\n"
                    "-----------------------------------------------------------"
@@ -153,7 +168,14 @@ take_input:
                    "-----------------------------------------------------------"
                    "----------"
                    "\n\n" ANSI_COLOR_RESET);
-            break;
+
+            free_hashtable(symbol_table);
+            clear_grammar(gram);
+            clear_parse_table(pt);
+            clear_sets(first_sets);
+            clear_sets(follow_sets);
+            clear_tree(parse_tree);
+            goto take_input;
         }
 
         // Take input again for invalid input

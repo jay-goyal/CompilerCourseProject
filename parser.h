@@ -17,6 +17,7 @@ ARYAN BANSAL - 2021A7PS2776P
 #include "parserDef.h"
 
 pt_t createParseTable(gram_t *gram, set_t **first_sets, set_t **follow_sets);
+void clear_parse_table(pt_t pt);
 
 stack_t *create_stack();
 void push(stack_t *stack, tnode_t *node);
