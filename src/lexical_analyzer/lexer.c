@@ -27,20 +27,13 @@ int populate_twin_buffers(int begin, int forward, char* buffer, int* fptr,
 }
 
 void print_lexical_op(int opfptr, tokeninfo_t* tk_info) {
-    char buf[1224];
-    int len;
-    len = sprintf(buf, "Line No. %d\t|", tk_info->line_no);
-    write(opfptr, buf, len);
+    printf("Line No. %d\t|", tk_info->line_no);
     if (tk_info->token_type == -2) {
-        len =
-            sprintf(buf, "  Lexical error for pattern '%s'\n", tk_info->lexeme);
-        write(opfptr, buf, len);
+        printf("  Lexical error for pattern '%s'\n", tk_info->lexeme);
         return;
     }
-    len = sprintf(buf, "  Token %-20s|", token_str[tk_info->token_type]);
-    write(opfptr, buf, len);
-    len = sprintf(buf, "  Lexeme '%s'\n", tk_info->lexeme);
-    write(opfptr, buf, len);
+    printf("  Token %-20s|", token_str[tk_info->token_type]);
+    printf("  Lexeme '%s'\n", tk_info->lexeme);
 }
 
 tokeninfo_t get_next_token(char* ip_filename, ht_t* symbol_table,

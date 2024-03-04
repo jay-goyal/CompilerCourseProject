@@ -11,7 +11,7 @@
 
 int main(int argc, char* argv[]) {
     if (argc != 3) {
-        printf("Invalid number of arguments");
+        printf("Invalid number of arguments. Expected 3 got %d\n", argc);
         exit(-1);
     }
     ht_t* symbol_table = create_hash_table();
