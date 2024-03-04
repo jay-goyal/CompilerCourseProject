@@ -27,7 +27,7 @@ int populate_twin_buffers(int begin, int forward, char* buffer, int* fptr,
     return read(*fptr, buffer + (BUF_SIZE * next), BUF_SIZE);
 }
 
-void print_lexical_op(int opfptr, tokeninfo_t* tk_info) {
+void print_lexical_op(tokeninfo_t* tk_info) {
     printf("Line No. %d\t|", tk_info->line_no);
     if (tk_info->token_type < -1) {
         printf(ANSI_COLOR_RED "  LEXICAL ERROR! Pattern <%s>:",
@@ -56,8 +56,7 @@ void print_lexical_op(int opfptr, tokeninfo_t* tk_info) {
     printf("  Lexeme '%s'\n", tk_info->lexeme);
 }
 
-tokeninfo_t get_next_token(char* ip_filename, ht_t* symbol_table,
-                           char* op_filename) {
+tokeninfo_t getNextToken(char* ip_filename, ht_t* symbol_table) {
     static unsigned int begin = 0;
     static unsigned int forward = 0;
     static int res_read;
@@ -65,7 +64,6 @@ tokeninfo_t get_next_token(char* ip_filename, ht_t* symbol_table,
     static bool is_end = false;
     static char* buffer = NULL;
     static int ip_fptr = -1;
-    static int op_fptr = -1;
     static state_t** td = NULL;
     static int curr_state = 0;
     static int line_number = 1;
@@ -75,9 +73,7 @@ tokeninfo_t get_next_token(char* ip_filename, ht_t* symbol_table,
     if (!is_lexer_init) {
         buffer = (char*)calloc(TBUF_SIZE, sizeof(char));
         is_lexer_init = true;
-        fclose(fopen(op_filename, "w"));
         ip_fptr = open(ip_filename, O_RDONLY);
-        op_fptr = open(op_filename, O_RDWR | O_CREAT, 0666);
         td = create_transition_diagram();
         res_read = read(ip_fptr, buffer, BUF_SIZE);
     }
@@ -89,11 +85,9 @@ tokeninfo_t get_next_token(char* ip_filename, ht_t* symbol_table,
     if (is_end) {
         if (buffer != NULL) free(buffer);
         if (ip_fptr != -1) close(ip_fptr);
-        if (op_fptr != -1) close(op_fptr);
         if (td != NULL) clear_transition_diagram(td);
         buffer = NULL;
         ip_fptr = -1;
-        op_fptr = -1;
         td = NULL;
         ret_token.token_type = -1;
         return ret_token;
@@ -107,11 +101,9 @@ start_parsing:
             is_end = true;
             free(buffer);
             close(ip_fptr);
-            close(op_fptr);
             clear_transition_diagram(td);
             buffer = NULL;
             ip_fptr = -1;
-            op_fptr = -1;
             td = NULL;
             ret_token.token_type = -1;
             return ret_token;
@@ -153,7 +145,7 @@ start_parsing:
             ret_token.line_no = line_number;
             ret_token.lexeme = (char*)malloc(sizeof(char) * val_len);
             strcpy(ret_token.lexeme, value);
-            print_lexical_op(op_fptr, &ret_token);
+            print_lexical_op(&ret_token);
             return ret_token;
         } else if (!td[curr_state]->is_final) {
             forward = (forward + 1) % TBUF_SIZE;
@@ -261,11 +253,11 @@ start_parsing:
     ret_token.line_no = line_number;
     ret_token.lexeme = (char*)malloc(sizeof(char) * val_len);
     strcpy(ret_token.lexeme, value);
-    print_lexical_op(op_fptr, &ret_token);
+    print_lexical_op(&ret_token);
     return ret_token;
 }
 
-void remove_comments(char* ipfile, char* opfile) {
+void removeComments(char* ipfile, char* opfile) {
     bool is_comment = false;
     bool is_new_line = true;
     FILE* fin = fopen(ipfile, "r");

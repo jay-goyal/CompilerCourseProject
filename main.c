@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <unistd.h>
 
 #include "grammar.h"
 #include "hash_table.h"
@@ -14,6 +15,14 @@ int main(int argc, char* argv[]) {
         printf("Invalid number of arguments. Expected 3 got %d\n", argc);
         exit(-1);
     }
+
+    if (access(argv[1], F_OK) == -1) {
+        printf(ANSI_COLOR_RED ANSI_COLOR_BOLD
+               "File %s does not exist\n" ANSI_COLOR_RESET,
+               argv[1]);
+        exit(-1);
+    }
+
     ht_t* symbol_table = create_hash_table();
     populate_symbol_table(symbol_table);
 
@@ -27,14 +36,14 @@ take_input:
             return 0;
         }
         case 1: {
-            remove_comments(argv[1], argv[2]);
+            removeComments(argv[1], argv[2]);
             break;
         }
         case 2: {
             tokeninfo_t ret_token;
             bool err_flag = false;
             do {
-                ret_token = get_next_token(argv[1], symbol_table, argv[2]);
+                ret_token = getNextToken(argv[1], symbol_table);
                 if (ret_token.token_type < -2) err_flag = true;
             } while (ret_token.token_type != -1);
             if (err_flag)
@@ -45,15 +54,15 @@ take_input:
         case 3: {
             gram_t* gram = create_grammar();
 
-            set_t** first_sets = compute_first_sets(gram);
+            set_t** first_sets = computeFirstSets(gram);
 
-            set_t** follow_sets = compute_follow_sets(gram, first_sets);
+            set_t** follow_sets = comuteFollowSets(gram, first_sets);
 
-            pt_t pt = create_parse_table(gram, first_sets, follow_sets);
+            pt_t pt = createParseTable(gram, first_sets, follow_sets);
 
             tree_t* parse_tree =
-                create_parse_tree(pt, argv[1], symbol_table, argv[2]);
-            print_parse_tree(parse_tree, argv[2]);
+                parseInputSourceCode(pt, argv[1], symbol_table);
+            printParseTree(parse_tree, argv[2]);
             break;
         }
         case 4: {
@@ -63,16 +72,16 @@ take_input:
 
             gram_t* gram = create_grammar();
 
-            set_t** first_sets = compute_first_sets(gram);
+            set_t** first_sets = computeFirstSets(gram);
 
-            set_t** follow_sets = compute_follow_sets(gram, first_sets);
+            set_t** follow_sets = comuteFollowSets(gram, first_sets);
 
-            pt_t pt = create_parse_table(gram, first_sets, follow_sets);
+            pt_t pt = createParseTable(gram, first_sets, follow_sets);
 
             tree_t* parse_tree =
-                create_parse_tree(pt, argv[1], symbol_table, argv[2]);
+                parseInputSourceCode(pt, argv[1], symbol_table);
 
-            print_parse_tree(parse_tree, argv[2]);
+            printParseTree(parse_tree, argv[2]);
 
             end_time = clock();
             total_cpu_time = (double)(end_time - start_time);

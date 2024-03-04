@@ -28,20 +28,20 @@ void clear_grammar(gram_t *gram) {
     free(gram);
 }
 
-set_t **compute_first_sets(gram_t *gram) {
+set_t **computeFirstSets(gram_t *gram) {
     set_t **first_sets = (set_t **)calloc(NUM_NONTERMINALS, sizeof(set_t *));
     for (int i = 0; i < NUM_NONTERMINALS; i++) {
         first_sets[i] = (set_t *)malloc(sizeof(set_t));
     }
 
     for (int i = 0; i < NUM_NONTERMINALS; i++) {
-        compute_first(first_sets, gram, gram->nonterminals[i], i);
+        computeFirst(first_sets, gram, gram->nonterminals[i], i);
     }
     return first_sets;
 }
 
-void compute_first(set_t **first_sets, gram_t *gram, nt_t *nonterm,
-                   int nt_index) {
+void computeFirst(set_t **first_sets, gram_t *gram, nt_t *nonterm,
+                  int nt_index) {
     if (visited[nt_index]) {
         return;
     }
@@ -55,9 +55,9 @@ void compute_first(set_t **first_sets, gram_t *gram, nt_t *nonterm,
                 first_sets[nt_index]->term[symb + 1] = 1;
                 break;
             } else {
-                compute_first(first_sets, gram,
-                              gram->nonterminals[symb - NUM_TERMINALS],
-                              symb - NUM_TERMINALS);
+                computeFirst(first_sets, gram,
+                             gram->nonterminals[symb - NUM_TERMINALS],
+                             symb - NUM_TERMINALS);
                 set_t *firstN = first_sets[symb - NUM_TERMINALS];
                 for (int j = 0; j <= NUM_TERMINALS; j++) {
                     if (firstN->term[j] == 1) first_sets[nt_index]->term[j] = 1;
@@ -73,7 +73,7 @@ void compute_first(set_t **first_sets, gram_t *gram, nt_t *nonterm,
     }
 }
 
-set_t **compute_follow_sets(gram_t *gram, set_t **first_sets) {
+set_t **comuteFollowSets(gram_t *gram, set_t **first_sets) {
     for (int i = 0; i < NUM_NONTERMINALS; i++) {
         visited[i] = false;
     }
@@ -84,7 +84,7 @@ set_t **compute_follow_sets(gram_t *gram, set_t **first_sets) {
     }
 
     for (int i = 0; i < NUM_NONTERMINALS; i++) {
-        compute_follow(follow_sets, first_sets, gram, gram->nonterminals[i], i);
+        computeFollow(follow_sets, first_sets, gram, gram->nonterminals[i], i);
     }
 
     // for(int i=0; i<NUM_NONTERMINALS; i++) {
@@ -107,8 +107,8 @@ set_t **compute_follow_sets(gram_t *gram, set_t **first_sets) {
     return follow_sets;
 }
 
-void compute_follow(set_t **follow_sets, set_t **first_sets, gram_t *gram,
-                    nt_t *nonterm, int nt_index) {
+void computeFollow(set_t **follow_sets, set_t **first_sets, gram_t *gram,
+                   nt_t *nonterm, int nt_index) {
     if (visited[nt_index]) {
         return;
     }
@@ -169,8 +169,8 @@ void compute_follow(set_t **follow_sets, set_t **first_sets, gram_t *gram,
                         ->productions[j]
                         ->right[num_right - 1] == nt_index + NUM_TERMINALS) {
                     follow_sets[nt_index]->term[0] = 0;
-                    compute_follow(follow_sets, first_sets, gram,
-                                   gram->nonterminals[i], i);
+                    computeFollow(follow_sets, first_sets, gram,
+                                  gram->nonterminals[i], i);
                     for (int l = 0; l <= NUM_TERMINALS + 1; l++) {
                         if (follow_sets[i]->term[l] == 1) {
                             follow_sets[nt_index]->term[l] = 1;
@@ -181,8 +181,8 @@ void compute_follow(set_t **follow_sets, set_t **first_sets, gram_t *gram,
 
             if (follow_sets[nt_index]->term[0] == 1) {
                 follow_sets[nt_index]->term[0] = 0;
-                compute_follow(follow_sets, first_sets, gram,
-                               gram->nonterminals[i], i);
+                computeFollow(follow_sets, first_sets, gram,
+                              gram->nonterminals[i], i);
                 for (int l = 0; l <= NUM_TERMINALS + 1; l++) {
                     if (follow_sets[i]->term[l] == 1) {
                         follow_sets[nt_index]->term[l] = 1;

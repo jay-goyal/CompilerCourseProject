@@ -6,7 +6,7 @@
 #include "grammar.h"
 #include "parserDef.h"
 
-pt_t create_parse_table(gram_t *gram, set_t **first_sets, set_t **follow_sets);
+pt_t createParseTable(gram_t *gram, set_t **first_sets, set_t **follow_sets);
 
 stack_t *create_stack();
 void push(stack_t *stack, tnode_t *node);
@@ -20,8 +20,7 @@ tnode_t *create_tnode(int val, tokeninfo_t tokeninfo);
 void insert_tnode(tnode_t *parent, tnode_t *child);
 void clear_tnode(tnode_t *node);
 void clear_tree(tree_t *tree);
-tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table,
-                          char *lexer_op_file);
+tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table);
 void print_node(tnode_t *node, int fptr);
-void print_parse_tree(tree_t *tree, char *parser_op_file);
+void printParseTree(tree_t *tree, char *parser_op_file);
 #endif

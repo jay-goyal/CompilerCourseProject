@@ -7,7 +7,7 @@
 
 #include "helper.h"
 
-pt_t create_parse_table(gram_t *gram, set_t **first_sets, set_t **follow_sets) {
+pt_t createParseTable(gram_t *gram, set_t **first_sets, set_t **follow_sets) {
     pt_t pt;
     pt.table = (prod_t ***)calloc(NUM_NONTERMINALS, sizeof(prod_t **));
     prod_t *synch = create_production();
@@ -150,10 +150,8 @@ void clear_tree(tree_t *tree) {
     free(tree);
 }
 
-tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table,
-                          char *lexer_op_file) {
-    tokeninfo_t ret_token =
-        get_next_token(src_filename, symbol_table, lexer_op_file);
+tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
+    tokeninfo_t ret_token = getNextToken(src_filename, symbol_table);
     bool lerr_flag = false;
     bool perr_flag = false;
 
@@ -167,8 +165,7 @@ tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table,
 
     while (ret_token.token_type != -1 && stack->size > 1) {
         if (ret_token.token_type < -1) {
-            ret_token =
-                get_next_token(src_filename, symbol_table, lexer_op_file);
+            ret_token = getNextToken(src_filename, symbol_table);
             lerr_flag = true;
             continue;
         }
@@ -182,8 +179,7 @@ tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table,
                        "  SYNTAX ERROR! at token type "
                        "%s\n" ANSI_COLOR_RESET,
                        ret_token.line_no, token_str[ret_token.token_type]);
-                ret_token =
-                    get_next_token(src_filename, symbol_table, lexer_op_file);
+                ret_token = getNextToken(src_filename, symbol_table);
                 perr_flag = true;
             }
             // synch -> error recovery
@@ -227,8 +223,7 @@ tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table,
         else {
             pop(stack);
             if (curr_node->val == ret_token.token_type) {
-                ret_token =
-                    get_next_token(src_filename, symbol_table, lexer_op_file);
+                ret_token = getNextToken(src_filename, symbol_table);
             } else {
                 printf("Line No. %d\t|" ANSI_COLOR_RED
                        "  SYNTAX ERROR! Expected Token "
@@ -321,7 +316,7 @@ void print_node(tnode_t *node, int fptr) {
     }
 }
 
-void print_parse_tree(tree_t *tree, char *parser_op_file) {
+void printParseTree(tree_t *tree, char *parser_op_file) {
     int fptr = open(parser_op_file, O_RDWR | O_CREAT, 0666);
     char buf[1500];
     int len =
