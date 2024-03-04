@@ -115,10 +115,10 @@ state_t** create_transition_diagram() {
     add_transition(td[0], "))", 37);
     add_transition(td[0], "  ", 35);
     add_transition(td[0], "\t\t", 35);
+    add_transition(td[0], "\r\r", 35);
     add_transition(td[0], "((", 38);
     add_transition(td[0], "bd", 39);
     add_transition(td[0], "\n\n", 61);
-    add_transition(td[0], "\r\r", 61);
     add_transition(td[0], "az", 43);
     add_transition(td[0], "++", 45);
     add_transition(td[0], "!!", 46);
@@ -182,7 +182,6 @@ state_t** create_transition_diagram() {
     add_transition(td[30], "&&", 31);
 
     add_transition(td[33], "\n\n", 34);
-    add_transition(td[33], "\r\r", 34);
     add_transition(td[33], "\0\x7f", 33);
 
     add_transition(td[35], "  ", 35);
