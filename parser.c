@@ -174,12 +174,13 @@ tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
     push(stack, node);
     parse_tree->root = node;
     int new_token = 1;
+    bool err = 0;
 
     while (ret_token.token_type != -1 && stack->size > 1) {
         if (ret_token.token_type < -1) {
             ret_token = getNextToken(src_filename, symbol_table, 1);
-            new_token = 1;
             lerr_flag = true;
+            err = 0;
             continue;
         }
 
@@ -188,17 +189,17 @@ tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
             // error -> skip
             if (pt.table[curr_node->val - NUM_TERMINALS]
                         [ret_token.token_type + 1] == NULL) {
-                if (new_token > 0)
+                    if(!err)
                     printf(
                         "Line No. %d\t|" ANSI_COLOR_RED
                         "  SYNTAX ERROR! Unexpected token %s encountered with "
-                        "value %s "
+                        "value '%s' "
                         "\n" ANSI_COLOR_RESET,
                         ret_token.line_no, token_str[ret_token.token_type],
                         ret_token.lexeme,
                         non_terminals[curr_node->val - NUM_NONTERMINALS]);
                 ret_token = getNextToken(src_filename, symbol_table, 1);
-                new_token = 1;
+                err = 0;
                 perr_flag = true;
             }
             // synch -> error recovery
@@ -206,19 +207,18 @@ tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
                              [ret_token.token_type + 1]
                                  ->num_right == 0) {
                 pop(stack);
-                if (new_token > 0)
+                    if(!err)
                     printf(
                         "Line No. %d\t|" ANSI_COLOR_RED
                         "  SYNTAX ERROR! Unexpected token %s encountered with "
-                        "value %s "
+                        "value '%s' "
                         "\n" ANSI_COLOR_RESET,
                         ret_token.line_no, token_str[ret_token.token_type],
                         ret_token.lexeme,
                         non_terminals[curr_node->val - NUM_NONTERMINALS]);
-                new_token = -1;
                 perr_flag = true;
+                err = 1;
             } else {
-                new_token = -1;
                 pop(stack);
                 int num_right = pt.table[curr_node->val - NUM_TERMINALS]
                                         [ret_token.token_type + 1]
@@ -250,16 +250,16 @@ tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
             pop(stack);
             if (curr_node->val == ret_token.token_type) {
                 ret_token = getNextToken(src_filename, symbol_table, 1);
-                new_token = 1;
+                err = 0;
             } else {
-                if (new_token > 0)
+                    if(!err)
                     printf(
                         "Line No. %d\t|" ANSI_COLOR_RED
-                        "  SYNTAX ERROR! The token %s for lexeme %s does not "
+                        "  SYNTAX ERROR! The token %s for lexeme '%s' does not "
                         "match with the expected token %s\n" ANSI_COLOR_RESET,
                         ret_token.line_no, token_str[ret_token.token_type],
                         ret_token.lexeme, token_str[curr_node->val]);
-                new_token = -1;
+                err = 1;
                 perr_flag = true;
             }
         }
