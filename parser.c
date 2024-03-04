@@ -187,10 +187,14 @@ tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
             if (pt.table[curr_node->val - NUM_TERMINALS]
                         [ret_token.token_type + 1] == NULL) {
                 if (new_token > 0)
-                    printf("Line No. %d\t|" ANSI_COLOR_RED
-                           "  SYNTAX ERROR! at token type "
-                           "%s\n" ANSI_COLOR_RESET,
-                           ret_token.line_no, token_str[ret_token.token_type]);
+                    printf(
+                        "Line No. %d\t|" ANSI_COLOR_RED
+                        "  SYNTAX ERROR! Unexpected token %s encountered with "
+                        "value %s "
+                        "\n" ANSI_COLOR_RESET,
+                        ret_token.line_no, token_str[ret_token.token_type],
+                        ret_token.lexeme,
+                        non_terminals[curr_node->val - NUM_NONTERMINALS]);
                 ret_token = getNextToken(src_filename, symbol_table);
                 new_token = 1;
                 perr_flag = true;
