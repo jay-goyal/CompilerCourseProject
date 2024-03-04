@@ -5,8 +5,8 @@ SRCDIR := src
 INCDIR := include
 
 CC := gcc
-CFLAGS := -c -Wall -O2
-DBGFLAGS := -c -Wall -O2 -ggdb
+CFLAGS := -c -w -O2
+DBGFLAGS := -c -w -O2 -ggdb
 
 SOURCES := $(shell find $(SRCDIR) -type f -iname '*.c')
 HEADERS := $(shell find $(SRCDIR) -type f -iname '*.h')

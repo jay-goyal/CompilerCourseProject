@@ -35,5 +35,3 @@ _main
 	write(c3);
 	return;
 end
-
-asdf
