@@ -116,8 +116,8 @@ start_parsing:
                 val_len = TBUF_SIZE - begin + forward + 1;
             } else if (val_len == 1) {
                 val_len++;
+                forward += 1;
             }
-            forward += 1;
             forward = forward % TBUF_SIZE;
             int tmp = populate_twin_buffers(begin, forward, buffer, &ip_fptr,
                                             &prev_buf, is_swap);
