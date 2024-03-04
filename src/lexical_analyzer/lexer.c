@@ -23,7 +23,7 @@ int populate_twin_buffers(int begin, int forward, char* buffer, int* fptr,
         return -2;
     }
     *prev_buf = next;
-    // bzero(buffer + (BUF_SIZE * next), BUF_SIZE);
+    bzero(buffer + (BUF_SIZE * next), BUF_SIZE);
     return read(*fptr, buffer + (BUF_SIZE * next), BUF_SIZE);
 }
 
