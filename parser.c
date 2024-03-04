@@ -21,6 +21,15 @@ pt_t createParseTable(gram_t *gram, set_t **first_sets, set_t **follow_sets) {
                 pt.table[i][j] = synch;
             }
         }
+        pt.table[i][TK_SEM + 1] = synch;
+        pt.table[i][TK_END + 1] = synch;
+        pt.table[i][TK_ENDRECORD + 1] = synch;
+        pt.table[i][TK_ENDUNION + 1] = synch;
+        pt.table[i][TK_ENDIF + 1] = synch;
+        pt.table[i][TK_ENDWHILE + 1] = synch;
+        pt.table[i][TK_ELSE + 1] = synch;
+        pt.table[i][TK_CL + 1] = synch;
+        pt.table[i][TK_SQR + 1] = synch;
     }
 
     for (int i = 0; i < NUM_NONTERMINALS; i++) {
