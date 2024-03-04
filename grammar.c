@@ -9,25 +9,25 @@ ARYAN BANSAL - 2021A7PS2776P
 */
 
 #include "grammar.h"
+
 #include <stdlib.h>
+
 #include "helper.h"
 #include "lexerDef.h"
 
 bool visited[NUM_NONTERMINALS] = {0};
 int occur[NUM_NONTERMINALS][NUM_NONTERMINALS] = {{0}};
 
-
 // Create a new grammar
 gram_t *create_grammar() {
-    gram_t *gram = (gram_t *)malloc(sizeof(gram_t));
+    gram_t *gram = (gram_t *)calloc(1, sizeof(gram_t));
     gram->nonterminals = (nt_t **)calloc(NUM_NONTERMINALS, sizeof(nt_t *));
 
     populate_productions(gram);
     return gram;
 }
 
-
-// Clear the grammar    
+// Clear the grammar
 void clear_grammar(gram_t *gram) {
     for (int i = 0; i < NUM_NONTERMINALS; i++) {
         for (int j = 0; j < gram->nonterminals[i]->num_prod; j++) {
@@ -45,7 +45,7 @@ void clear_grammar(gram_t *gram) {
 set_t **computeFirstSets(gram_t *gram) {
     set_t **first_sets = (set_t **)calloc(NUM_NONTERMINALS, sizeof(set_t *));
     for (int i = 0; i < NUM_NONTERMINALS; i++) {
-        first_sets[i] = (set_t *)malloc(sizeof(set_t));
+        first_sets[i] = (set_t *)calloc(1, sizeof(set_t));
     }
 
     for (int i = 0; i < NUM_NONTERMINALS; i++) {
@@ -97,7 +97,7 @@ set_t **comuteFollowSets(gram_t *gram, set_t **first_sets) {
     set_t **follow_sets = (set_t **)calloc(NUM_NONTERMINALS, sizeof(set_t *));
 
     for (int i = 0; i < NUM_NONTERMINALS; i++) {
-        follow_sets[i] = (set_t *)malloc(sizeof(set_t));
+        follow_sets[i] = (set_t *)calloc(1, sizeof(set_t));
     }
 
     for (int i = 0; i < NUM_NONTERMINALS; i++) {
@@ -205,14 +205,14 @@ void clear_sets(set_t **sets) {
 
 // Add a non-terminal to the grammar
 nt_t *add_nonterminal(gram_t *gram, int nt) {
-    gram->nonterminals[nt - NUM_TERMINALS] = (nt_t *)malloc(sizeof(nt_t));
+    gram->nonterminals[nt - NUM_TERMINALS] = (nt_t *)calloc(1, sizeof(nt_t));
     gram->nonterminals[nt - NUM_TERMINALS]->num_prod = 0;
     return gram->nonterminals[nt - NUM_TERMINALS];
 }
 
 // Create a new production
 prod_t *create_production() {
-    prod_t *prod = (prod_t *)malloc(sizeof(prod_t));
+    prod_t *prod = (prod_t *)calloc(1, sizeof(prod_t));
     prod->num_right = 0;
     return prod;
 }
@@ -237,7 +237,6 @@ void add_right(prod_t *prod, int right, int nt) {
 
 // Populate the productions of the grammar
 void populate_productions(gram_t *gram) {
-
     // Add the non-terminals
     // Create productions for each Non-Terminal
     nt_t *nonterm = add_nonterminal(gram, PROGRAM);

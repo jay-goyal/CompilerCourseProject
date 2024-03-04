@@ -19,7 +19,8 @@ ARYAN BANSAL - 2021A7PS2776P
 #define BUF_SIZE 512
 #define TBUF_SIZE (BUF_SIZE * 2)
 
-tokeninfo_t getNextToken(char* ip_filename, ht_t* symbol_table, bool parse);
+tokeninfo_t getNextToken(char* ip_filename, ht_t* symbol_table, bool parse,
+                         bool is_lexer_init);
 void removeComments(char* fin);
 
 #endif  // !LEXER_H

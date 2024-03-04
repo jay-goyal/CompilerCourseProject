@@ -15,7 +15,7 @@ ARYAN BANSAL - 2021A7PS2776P
 // Create a new state
 state_t* create_state(int retract, bool exit, bool line_increment,
                       bool is_final) {
-    state_t* state = (state_t*)malloc(sizeof(struct State));
+    state_t* state = (state_t*)calloc(1, sizeof(struct State));
     state->transitions.size = 0;
     state->transitions.capacity = 1;
     state->transitions.symbol =
@@ -42,7 +42,7 @@ void add_transition(state_t* state, char symbol[], int next_state) {
     }
     state->transitions.size++;
     state->transitions.symbol[state->transitions.size - 1] =
-        (char*)malloc(2 * sizeof(char));
+        (char*)calloc(2, sizeof(char));
     state->transitions.symbol[state->transitions.size - 1][0] = symbol[0];
     state->transitions.symbol[state->transitions.size - 1][1] = symbol[1];
     state->transitions.next_state[state->transitions.size - 1] = next_state;
@@ -51,7 +51,7 @@ void add_transition(state_t* state, char symbol[], int next_state) {
 // Create the transition diagram
 state_t** create_transition_diagram() {
     // Create states
-    state_t** td = (state_t**)malloc(NUM_STATES * sizeof(state_t*));
+    state_t** td = (state_t**)calloc(NUM_STATES, sizeof(state_t*));
     for (int i = 0; i < NUM_STATES; i++) {
         int retract = 0;
         bool exit = false, line_increment = false, is_final = false;
@@ -225,7 +225,6 @@ state_t** create_transition_diagram() {
     return td;
 }
 
-
 // Get the next state (simulating the transition diagram)
 int get_next_state(int curr_state, char symbol, state_t** td) {
     state_t* state = td[curr_state];
@@ -241,7 +240,6 @@ int get_next_state(int curr_state, char symbol, state_t** td) {
 
     return -1;
 }
-
 
 // Free the transition diagram
 void clear_transition_diagram(state_t** td) {

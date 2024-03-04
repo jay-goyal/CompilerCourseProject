@@ -93,7 +93,7 @@ pt_t createParseTable(gram_t *gram, set_t **first_sets, set_t **follow_sets) {
 
 void clear_parse_table(pt_t pt) {
     free(pt.table[0][TK_SEM + 1]);
-    for(int i=0; i<NUM_NONTERMINALS; i++) {
+    for (int i = 0; i < NUM_NONTERMINALS; i++) {
         free(pt.table[i]);
     }
     free(pt.table);
@@ -101,7 +101,7 @@ void clear_parse_table(pt_t pt) {
 
 /* STACK */
 stack_t *create_stack() {
-    stack_t *stack = (stack_t *)malloc(sizeof(stack_t));
+    stack_t *stack = (stack_t *)calloc(1, sizeof(stack_t));
     stack->size = 0;
     return stack;
 }
@@ -140,13 +140,13 @@ void clear_stack(stack_t *stack) {
 
 /* TREE */
 tree_t *create_tree() {
-    tree_t *tree = (tree_t *)malloc(sizeof(tree_t));
+    tree_t *tree = (tree_t *)calloc(1, sizeof(tree_t));
     tree->root = NULL;
     return tree;
 }
 
 tnode_t *create_tnode(int val, tokeninfo_t tokeninfo) {
-    tnode_t *node = (tnode_t *)malloc(sizeof(tnode_t));
+    tnode_t *node = (tnode_t *)calloc(1, sizeof(tnode_t));
     node->val = val;
     node->tokeninfo = tokeninfo;
     node->num_children = 0;
@@ -180,13 +180,14 @@ void clear_tree(tree_t *tree) {
 
 // parse the input source code
 tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
-    tokeninfo_t ret_token = getNextToken(src_filename, symbol_table, 1);
+    tokeninfo_t ret_token = getNextToken(src_filename, symbol_table, 1, false);
     bool lerr_flag = false;
     bool perr_flag = false;
 
     tree_t *parse_tree = create_tree();
     stack_t *stack = create_stack();
     tnode_t *node = create_tnode(BOTTOMMARKER, ret_token);
+    tnode_t *bottom = node;
     push(stack, node);
     node = create_tnode(PROGRAM, ret_token);
     push(stack, node);
@@ -196,7 +197,7 @@ tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
 
     while (ret_token.token_type != -1 && stack->size > 1) {
         if (ret_token.token_type < -1) {
-            ret_token = getNextToken(src_filename, symbol_table, 1);
+            ret_token = getNextToken(src_filename, symbol_table, 1, true);
             lerr_flag = true;
             err = 0;
             continue;
@@ -207,7 +208,7 @@ tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
             // error -> skip
             if (pt.table[curr_node->val - NUM_TERMINALS]
                         [ret_token.token_type + 1] == NULL) {
-                    if(!err)
+                if (!err)
                     printf(
                         "Line No. %d\t|" ANSI_COLOR_RED
                         "  SYNTAX ERROR! Unexpected token %s encountered with "
@@ -216,7 +217,7 @@ tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
                         ret_token.line_no, token_str[ret_token.token_type],
                         ret_token.lexeme,
                         non_terminals[curr_node->val - NUM_NONTERMINALS]);
-                ret_token = getNextToken(src_filename, symbol_table, 1);
+                ret_token = getNextToken(src_filename, symbol_table, 1, true);
                 err = 0;
                 perr_flag = true;
             }
@@ -225,7 +226,7 @@ tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
                              [ret_token.token_type + 1]
                                  ->num_right == 0) {
                 pop(stack);
-                    if(!err)
+                if (!err)
                     printf(
                         "Line No. %d\t|" ANSI_COLOR_RED
                         "  SYNTAX ERROR! Unexpected token %s encountered with "
@@ -267,10 +268,10 @@ tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
         else {
             pop(stack);
             if (curr_node->val == ret_token.token_type) {
-                ret_token = getNextToken(src_filename, symbol_table, 1);
+                ret_token = getNextToken(src_filename, symbol_table, 1, true);
                 err = 0;
             } else {
-                    if(!err)
+                if (!err)
                     printf(
                         "Line No. %d\t|" ANSI_COLOR_RED
                         "  SYNTAX ERROR! The token %s for lexeme '%s' does not "
@@ -287,10 +288,10 @@ tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
     if (ret_token.token_type == -1) {
         if (!perr_flag && !lerr_flag)
             printf(ANSI_COLOR_GREEN ANSI_COLOR_BOLD
-                   "\n\nParse Successful\n" ANSI_COLOR_RESET);
+                   "\nParse Successful\n" ANSI_COLOR_RESET);
         else
             printf(ANSI_COLOR_RED ANSI_COLOR_BOLD
-                   "\n\nParse Unsuccessful\n" ANSI_COLOR_RESET);
+                   "\nParse Unsuccessful\n" ANSI_COLOR_RESET);
         if (lerr_flag)
             printf(ANSI_COLOR_RED ANSI_COLOR_BOLD
                    "Lexical Errors Reported\n" ANSI_COLOR_RESET);
@@ -310,6 +311,8 @@ tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
                "\n\nSyntax Error, Tokens after _main function provided "
                "run\n\n" ANSI_COLOR_RESET);
     }
+
+    free(bottom);
 
     return parse_tree;
 }
@@ -367,14 +370,12 @@ void print_node(tnode_t *node, int fptr) {
     len = sprintf(buf, " no       %s\n",
                   non_terminals[node->val - NUM_TERMINALS]);
     write(fptr, buf, len);
-    
 
     // print the remaining children
     for (int i = 1; i < num_children; i++) {
         print_node(node->children[i], fptr);
     }
 }
-
 
 // print the parse tree to the file
 void printParseTree(tree_t *tree, char *parser_op_file) {

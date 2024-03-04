@@ -15,7 +15,7 @@ ARYAN BANSAL - 2021A7PS2776P
 
 // create a new node
 node_t* make_node(stentry_t* key) {
-    node_t* temp = (node_t*)malloc(sizeof(node_t));
+    node_t* temp = (node_t*)calloc(1, sizeof(node_t));
     if (temp == NULL) {
         printf("Mem Alloc failed");
     }

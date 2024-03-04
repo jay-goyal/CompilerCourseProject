@@ -41,7 +41,7 @@ unsigned int hash(char* key) {
 
 // create an empty hash table
 ht_t* create_hash_table() {
-    ht_t* hashtable = (ht_t*)malloc(sizeof(ht_t) * 1);
+    ht_t* hashtable = (ht_t*)calloc(1, sizeof(ht_t));
     if (hashtable == NULL) {
         printf("Cannot allocate the Hash Table");
         exit(-1);

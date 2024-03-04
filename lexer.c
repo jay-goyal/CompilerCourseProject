@@ -22,16 +22,15 @@ ARYAN BANSAL - 2021A7PS2776P
 #include "lexerDef.h"
 #include "transition_diagram.h"
 
-
 // populate the twin buffers with the next set of characters
 int populate_twin_buffers(int begin, int forward, char* buffer, int* fptr,
-                          int* prev_buf, bool is_swap) {
+                          int* prev_buf, bool is_swap, int curr_state) {
     int active = begin / BUF_SIZE;
     int next = forward / BUF_SIZE;
     if (next == *prev_buf || next == active) {
         return -1;
     }
-    if (is_swap) {
+    if (is_swap && curr_state != 33) {
         return -2;
     }
     *prev_buf = next;
@@ -65,8 +64,8 @@ void print_lexical_op(tokeninfo_t* tk_info, bool parse) {
         }
         return;
     }
-    
-    if(!parse) {
+
+    if (!parse) {
         printf("Line No. %d\t|", tk_info->line_no);
         printf("  Token %-20s|", token_str[tk_info->token_type]);
         printf("  Lexeme '%s'\n", tk_info->lexeme);
@@ -74,11 +73,11 @@ void print_lexical_op(tokeninfo_t* tk_info, bool parse) {
 }
 
 // get the next token from the input file
-tokeninfo_t getNextToken(char* ip_filename, ht_t* symbol_table, bool parse) {
+tokeninfo_t getNextToken(char* ip_filename, ht_t* symbol_table, bool parse,
+                         bool is_lexer_init) {
     static unsigned int begin = 0;
     static unsigned int forward = 0;
     static int res_read;
-    static bool is_lexer_init = false;
     static bool is_end = false;
     static char* buffer = NULL;
     static int ip_fptr = -1;
@@ -90,10 +89,15 @@ tokeninfo_t getNextToken(char* ip_filename, ht_t* symbol_table, bool parse) {
     bool is_swap = false;
     if (!is_lexer_init) {
         buffer = (char*)calloc(TBUF_SIZE, sizeof(char));
-        is_lexer_init = true;
         ip_fptr = open(ip_filename, O_RDONLY);
         td = create_transition_diagram();
         res_read = read(ip_fptr, buffer, BUF_SIZE);
+        prev_buf = 0;
+        line_number = 1;
+        is_end = false;
+        begin = 0;
+        forward = 0;
+        curr_state = 0;
     }
 
     if (res_read < BUF_SIZE && forward % BUF_SIZE >= res_read) {
@@ -139,7 +143,7 @@ start_parsing:
             }
             forward = forward % TBUF_SIZE;
             int tmp = populate_twin_buffers(begin, forward, buffer, &ip_fptr,
-                                            &prev_buf, is_swap);
+                                            &prev_buf, is_swap, curr_state);
             if (tmp == -2) {
                 printf(ANSI_COLOR_RED
                        "Lexeme greater that %d characters exists at line "
@@ -161,14 +165,14 @@ start_parsing:
             curr_state = 0;
             ret_token.token_type = -2;
             ret_token.line_no = line_number;
-            ret_token.lexeme = (char*)malloc(sizeof(char) * val_len);
+            ret_token.lexeme = (char*)calloc(val_len, sizeof(char));
             strcpy(ret_token.lexeme, value);
             print_lexical_op(&ret_token, parse);
             return ret_token;
         } else if (!td[curr_state]->is_final) {
             forward = (forward + 1) % TBUF_SIZE;
             int tmp = populate_twin_buffers(begin, forward, buffer, &ip_fptr,
-                                            &prev_buf, is_swap);
+                                            &prev_buf, is_swap, curr_state);
             if (tmp == -2) {
                 printf(ANSI_COLOR_RED
                        "Lexeme greater that %d characters exists at line "
@@ -195,12 +199,12 @@ start_parsing:
     forward = forward % TBUF_SIZE;
 
     int tmp = populate_twin_buffers(begin, forward, buffer, &ip_fptr, &prev_buf,
-                                    is_swap);
+                                    is_swap, curr_state);
     if (tmp == -2) {
         printf(ANSI_COLOR_RED
-                       "Lexeme greater that %d characters exists at line "
-                       "number: %d\n" ANSI_COLOR_RESET,
-                       TBUF_SIZE, line_number);
+               "Lexeme greater that %d characters exists at line "
+               "number: %d\n" ANSI_COLOR_RESET,
+               TBUF_SIZE, line_number);
         exit(-1);
     }
 
@@ -270,7 +274,7 @@ start_parsing:
     }
 
     ret_token.line_no = line_number;
-    ret_token.lexeme = (char*)malloc(sizeof(char) * val_len);
+    ret_token.lexeme = (char*)calloc(val_len, sizeof(char));
     strcpy(ret_token.lexeme, value);
     print_lexical_op(&ret_token, parse);
     return ret_token;
@@ -283,10 +287,10 @@ void removeComments(char* ipfile) {
     char c = fgetc(fin);
 
     printf(ANSI_COLOR_GREEN ANSI_COLOR_BOLD
-                   "Code After removal of comments\n"
-                   "-----------------------------------------------------------"
-                   "----------"
-                   "\n\n" ANSI_COLOR_RESET);
+           "Code After removal of comments\n"
+           "-----------------------------------------------------------"
+           "----------"
+           "\n\n" ANSI_COLOR_RESET);
 
     while (c != EOF) {
         if (c == '%') {
@@ -296,7 +300,7 @@ void removeComments(char* ipfile) {
             }
         }
 
-        if (!is_comment) //fputc(c, fout);
+        if (!is_comment)  // fputc(c, fout);
             printf("%c", c);
 
         if (c == '\n') {
@@ -310,8 +314,8 @@ void removeComments(char* ipfile) {
     }
 
     printf(ANSI_COLOR_GREEN ANSI_COLOR_BOLD
-                   "\n"
-                   "-----------------------------------------------------------"
-                   "----------"
-                   "\n" ANSI_COLOR_RESET);
+           "\n"
+           "-----------------------------------------------------------"
+           "----------"
+           "\n" ANSI_COLOR_RESET);
 }

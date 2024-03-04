@@ -35,7 +35,21 @@ int main(int argc, char* argv[]) {
         exit(-1);
     }
 
+    clock_t gen_start_time, gen_end_time;
+    double gen_total_cpu_time;
+    gen_start_time = clock();
+
     // Create Symbol Table
+    ht_t* symbol_table = create_hash_table();
+    populate_symbol_table(symbol_table);
+
+    gram_t* gram = create_grammar();
+    set_t** first_sets = computeFirstSets(gram);
+    set_t** follow_sets = comuteFollowSets(gram, first_sets);
+    pt_t pt = createParseTable(gram, first_sets, follow_sets);
+
+    gen_end_time = clock();
+    gen_total_cpu_time = (double)(gen_end_time - gen_start_time);
 
     // Print Status of Submission
     printf(
@@ -65,8 +79,6 @@ int main(int argc, char* argv[]) {
 take_input:
     printf("Input the Operation:\n");
     scanf("%d", &op);
-    printf("\n\n");
-
     switch (op) {
         // Exit
         case 0: {
@@ -83,14 +95,14 @@ take_input:
 
         // Lexical Analysis
         case 2: {
-            ht_t* symbol_table = create_hash_table();
-            populate_symbol_table(symbol_table);
-            tokeninfo_t ret_token;
+            tokeninfo_t ret_token =
+                getNextToken(argv[1], symbol_table, 0, false);
+            ;
             bool err_flag = false;
-            do {
-                ret_token = getNextToken(argv[1], symbol_table, 0);
+            while (ret_token.token_type != -1) {
                 if (ret_token.token_type < -2) err_flag = true;
-            } while (ret_token.token_type != -1);
+                ret_token = getNextToken(argv[1], symbol_table, 0, true);
+            }
             if (err_flag)
                 printf(ANSI_COLOR_RED ANSI_COLOR_BOLD
                        "\n\nLexical Errors Reported\n\n" ANSI_COLOR_RESET);
@@ -98,61 +110,32 @@ take_input:
                 printf(ANSI_COLOR_GREEN ANSI_COLOR_BOLD
                        "\n\nLexical Analysis Finished. No Errors "
                        "Reported\n\n" ANSI_COLOR_RESET);
-            free_hashtable(symbol_table);
+
             goto take_input;
         }
 
         // Lexical, Syntax Analysis and Print Parse Tree
         case 3: {
-            ht_t* symbol_table = create_hash_table();
-            populate_symbol_table(symbol_table);
-
-            gram_t* gram = create_grammar();
-
-            set_t** first_sets = computeFirstSets(gram);
-
-            set_t** follow_sets = comuteFollowSets(gram, first_sets);
-
-            pt_t pt = createParseTable(gram, first_sets, follow_sets);
-
             tree_t* parse_tree =
                 parseInputSourceCode(pt, argv[1], symbol_table);
             printParseTree(parse_tree, argv[2]);
-
-            free_hashtable(symbol_table);
-            clear_grammar(gram);
-            clear_parse_table(pt);
-            clear_sets(first_sets);
-            clear_sets(follow_sets);
-            clear_tree(parse_tree);
             goto take_input;
         }
 
         // Time the Lexical, Syntax Analysis and Print Parse Tree
         case 4: {
-            ht_t* symbol_table = create_hash_table();
-            populate_symbol_table(symbol_table);
-
-            gram_t* gram = create_grammar();
-
-            set_t** first_sets = computeFirstSets(gram);
-
-            set_t** follow_sets = comuteFollowSets(gram, first_sets);
-
-            pt_t pt = createParseTable(gram, first_sets, follow_sets);
-
             clock_t start_time, end_time;
             double total_cpu_time, total_cpu_time_in_seconds;
             start_time = clock();
 
             tree_t* parse_tree =
                 parseInputSourceCode(pt, argv[1], symbol_table);
+            printParseTree(parse_tree, argv[2]);
 
             end_time = clock();
-            total_cpu_time = (double)(end_time - start_time);
+            total_cpu_time =
+                (double)(end_time - start_time) + gen_total_cpu_time;
             total_cpu_time_in_seconds = total_cpu_time / CLOCKS_PER_SEC;
-
-            printParseTree(parse_tree, argv[2]);
             printf(ANSI_COLOR_GREEN ANSI_COLOR_BOLD
                    "\n"
                    "-----------------------------------------------------------"
@@ -169,12 +152,6 @@ take_input:
                    "----------"
                    "\n\n" ANSI_COLOR_RESET);
 
-            free_hashtable(symbol_table);
-            clear_grammar(gram);
-            clear_parse_table(pt);
-            clear_sets(first_sets);
-            clear_sets(follow_sets);
-            clear_tree(parse_tree);
             goto take_input;
         }
 
