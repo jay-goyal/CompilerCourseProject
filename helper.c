@@ -4,6 +4,8 @@
 
 #include "lexerDef.h"
 
+
+// populate the symbol table with the keywords
 void populate_symbol_table(ht_t* st) {
     stentry_t* entry = (stentry_t*)calloc(1, sizeof(stentry_t));
     char* lexeme = (char*)calloc(5, sizeof(char));

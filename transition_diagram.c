@@ -2,6 +2,7 @@
 
 #include "lexerDef.h"
 
+// Create a new state
 state_t* create_state(int retract, bool exit, bool line_increment,
                       bool is_final) {
     state_t* state = (state_t*)malloc(sizeof(struct State));
@@ -18,6 +19,7 @@ state_t* create_state(int retract, bool exit, bool line_increment,
     return state;
 }
 
+// Add a transition to the state
 void add_transition(state_t* state, char symbol[], int next_state) {
     if (state->transitions.capacity < state->transitions.size + 1) {
         state->transitions.symbol =
@@ -36,6 +38,7 @@ void add_transition(state_t* state, char symbol[], int next_state) {
     state->transitions.next_state[state->transitions.size - 1] = next_state;
 }
 
+// Create the transition diagram
 state_t** create_transition_diagram() {
     // Create states
     state_t** td = (state_t**)malloc(NUM_STATES * sizeof(state_t*));
@@ -212,6 +215,8 @@ state_t** create_transition_diagram() {
     return td;
 }
 
+
+// Get the next state (simulating the transition diagram)
 int get_next_state(int curr_state, char symbol, state_t** td) {
     state_t* state = td[curr_state];
     transitions_t transitions = state->transitions;
@@ -227,6 +232,8 @@ int get_next_state(int curr_state, char symbol, state_t** td) {
     return -1;
 }
 
+
+// Free the transition diagram
 void clear_transition_diagram(state_t** td) {
     for (int i = 0; i < NUM_STATES; i++) {
         state_t* state = td[i];

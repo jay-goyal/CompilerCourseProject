@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+// check if the node exists in the hash table
 node_t* check_node_exists(ht_t* hashtable, stentry_t* key) {
     unsigned int hash_value = hash(key->lexeme);
     node_t** entries = hashtable->entries;
@@ -16,6 +17,7 @@ node_t* check_node_exists(ht_t* hashtable, stentry_t* key) {
     return NULL;
 }
 
+// compute hash value for the key
 unsigned int hash(char* key) {
     unsigned int value = 0;
     unsigned int len = strlen(key);
@@ -27,6 +29,7 @@ unsigned int hash(char* key) {
     return value;
 }
 
+// create an empty hash table
 ht_t* create_hash_table() {
     ht_t* hashtable = (ht_t*)malloc(sizeof(ht_t) * 1);
     if (hashtable == NULL) {
@@ -39,6 +42,7 @@ ht_t* create_hash_table() {
     return hashtable;
 }
 
+// insert a new node in the hash table if key does not exist
 stentry_t* insert_entry(ht_t* hashtable, stentry_t* key) {
     unsigned int hash_value = hash(key->lexeme);
     node_t** entries = hashtable->entries;
@@ -55,6 +59,7 @@ stentry_t* insert_entry(ht_t* hashtable, stentry_t* key) {
     return NULL;
 }
 
+// free the hash table
 void free_hashtable(ht_t* hashtable) {
     for (int i = 0; i < TABLE_SIZE; i++) {
         delete_list(hashtable->entries[i]);

@@ -7,6 +7,7 @@
 
 #include "helper.h"
 
+// create parse table
 pt_t createParseTable(gram_t *gram, set_t **first_sets, set_t **follow_sets) {
     pt_t pt;
     pt.table = (prod_t ***)calloc(NUM_NONTERMINALS, sizeof(prod_t **));
@@ -159,6 +160,7 @@ void clear_tree(tree_t *tree) {
     free(tree);
 }
 
+// parse the input source code
 tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
     tokeninfo_t ret_token = getNextToken(src_filename, symbol_table);
     bool lerr_flag = false;
@@ -263,6 +265,7 @@ tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
         }
     }
 
+    // tokens finished
     if (ret_token.token_type == -1) {
         if (!perr_flag && !lerr_flag)
             printf(ANSI_COLOR_GREEN ANSI_COLOR_BOLD
@@ -277,7 +280,9 @@ tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
             printf(ANSI_COLOR_RED ANSI_COLOR_BOLD
                    "Syntax Errors Reported\n" ANSI_COLOR_RESET);
 
-    } else {
+    }
+    // tokens remaining after main
+    else {
         if (ret_token.token_type >= 0)
             printf("Line No. %d\t|" ANSI_COLOR_RED
                    "  SYNTAX ERROR! No Token Expected"
@@ -291,6 +296,7 @@ tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
     return parse_tree;
 }
 
+// print the node
 void print_node(tnode_t *node, int fptr) {
     int num_children = node->num_children;
     char buf[1500];
@@ -298,6 +304,7 @@ void print_node(tnode_t *node, int fptr) {
 
     // leaf node
     if (num_children == 0) {
+        // epsilon
         if (node->val == -1) {
             len = sprintf(buf,
                           "----                 %-4d   EPSILON          ----   "
@@ -324,7 +331,10 @@ void print_node(tnode_t *node, int fptr) {
         return;
     }
 
+    // print the first child
     print_node(node->children[0], fptr);
+
+    // print the current node
     len = sprintf(buf, "----                 %-4d   ----             ----   ",
                   node->tokeninfo.line_no);
     write(fptr, buf, len);
@@ -339,12 +349,16 @@ void print_node(tnode_t *node, int fptr) {
     len = sprintf(buf, " no       %s\n",
                   non_terminals[node->val - NUM_TERMINALS]);
     write(fptr, buf, len);
+    
 
+    // print the remaining children
     for (int i = 1; i < num_children; i++) {
         print_node(node->children[i], fptr);
     }
 }
 
+
+// print the parse tree to the file
 void printParseTree(tree_t *tree, char *parser_op_file) {
     int fptr = open(parser_op_file, O_RDWR | O_CREAT, 0666);
     char buf[1500];

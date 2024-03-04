@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// create a new node
 node_t* make_node(stentry_t* key) {
     node_t* temp = (node_t*)malloc(sizeof(node_t));
     if (temp == NULL) {
@@ -13,6 +14,7 @@ node_t* make_node(stentry_t* key) {
     return temp;
 }
 
+// insert a new node at the end of the list
 node_t* insert_tail_node(node_t* head, stentry_t* key) {
     node_t* tail = make_node(key);
 
@@ -28,6 +30,7 @@ node_t* insert_tail_node(node_t* head, stentry_t* key) {
     return tail;
 }
 
+// delete the last node in the list
 void delete_tail_node(node_t* head) {
     if (head == NULL) {
         return;
@@ -45,6 +48,7 @@ void delete_tail_node(node_t* head) {
     temp->next = NULL;
 }
 
+// delete the entire list
 void delete_list(node_t* head) {
     if (head == NULL) {
         return;

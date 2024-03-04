@@ -5,6 +5,8 @@
 
 void populate_symbol_table(ht_t* st);
 
+
+// ANSI Color Codes
 #define ANSI_COLOR_RED "\x1b[31m"
 #define ANSI_COLOR_GREEN "\x1b[32m"
 #define ANSI_COLOR_BLUE "\x1b[34m"

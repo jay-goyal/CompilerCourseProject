@@ -1,13 +1,13 @@
 #include "grammar.h"
-
 #include <stdlib.h>
-
 #include "helper.h"
 #include "lexerDef.h"
 
 bool visited[NUM_NONTERMINALS] = {0};
 int occur[NUM_NONTERMINALS][NUM_NONTERMINALS] = {{0}};
 
+
+// Create a new grammar
 gram_t *create_grammar() {
     gram_t *gram = (gram_t *)malloc(sizeof(gram_t));
     gram->nonterminals = (nt_t **)calloc(NUM_NONTERMINALS, sizeof(nt_t *));
@@ -16,6 +16,8 @@ gram_t *create_grammar() {
     return gram;
 }
 
+
+// Clear the grammar    
 void clear_grammar(gram_t *gram) {
     for (int i = 0; i < NUM_NONTERMINALS; i++) {
         for (int j = 0; j < gram->nonterminals[i]->num_prod; j++) {
@@ -29,6 +31,7 @@ void clear_grammar(gram_t *gram) {
     free(gram);
 }
 
+// Compute the first sets
 set_t **computeFirstSets(gram_t *gram) {
     set_t **first_sets = (set_t **)calloc(NUM_NONTERMINALS, sizeof(set_t *));
     for (int i = 0; i < NUM_NONTERMINALS; i++) {
@@ -42,6 +45,7 @@ set_t **computeFirstSets(gram_t *gram) {
     return first_sets;
 }
 
+// Compute the first set for a non-terminal
 void computeFirst(set_t **first_sets, gram_t *gram, nt_t *nonterm,
                   int nt_index) {
     if (visited[nt_index]) {
@@ -75,6 +79,7 @@ void computeFirst(set_t **first_sets, gram_t *gram, nt_t *nonterm,
     }
 }
 
+// Compute the follow sets
 set_t **comuteFollowSets(gram_t *gram, set_t **first_sets) {
     for (int i = 0; i < NUM_NONTERMINALS; i++) {
         visited[i] = false;
@@ -92,6 +97,7 @@ set_t **comuteFollowSets(gram_t *gram, set_t **first_sets) {
     return follow_sets;
 }
 
+// Compute the follow set for a non-terminal
 void computeFollow(set_t **follow_sets, set_t **first_sets, gram_t *gram,
                    nt_t *nonterm, int nt_index) {
     if (visited[nt_index]) {
@@ -164,6 +170,7 @@ void computeFollow(set_t **follow_sets, set_t **first_sets, gram_t *gram,
                 }
             }
 
+            // epsilon production
             if (follow_sets[nt_index]->term[0] == 1) {
                 follow_sets[nt_index]->term[0] = 0;
                 computeFollow(follow_sets, first_sets, gram,
@@ -178,6 +185,7 @@ void computeFollow(set_t **follow_sets, set_t **first_sets, gram_t *gram,
     }
 }
 
+// Clear the first and follow sets
 void clear_sets(set_t **sets) {
     for (int i = 0; i < NUM_NONTERMINALS; i++) {
         free(sets[i]);
@@ -185,18 +193,21 @@ void clear_sets(set_t **sets) {
     free(sets);
 }
 
+// Add a non-terminal to the grammar
 nt_t *add_nonterminal(gram_t *gram, int nt) {
     gram->nonterminals[nt - NUM_TERMINALS] = (nt_t *)malloc(sizeof(nt_t));
     gram->nonterminals[nt - NUM_TERMINALS]->num_prod = 0;
     return gram->nonterminals[nt - NUM_TERMINALS];
 }
 
+// Create a new production
 prod_t *create_production() {
     prod_t *prod = (prod_t *)malloc(sizeof(prod_t));
     prod->num_right = 0;
     return prod;
 }
 
+// Add a production to a non-terminal
 void add_production(nt_t *nonterm, prod_t *prod) {
     nonterm->num_prod++;
     nonterm->productions = (prod_t **)realloc(
@@ -204,6 +215,7 @@ void add_production(nt_t *nonterm, prod_t *prod) {
     nonterm->productions[nonterm->num_prod - 1] = prod;
 }
 
+// Add a right hand side to a production
 void add_right(prod_t *prod, int right, int nt) {
     prod->num_right++;
     prod->right = (int *)realloc(prod->right, prod->num_right * sizeof(int));
@@ -213,7 +225,11 @@ void add_right(prod_t *prod, int right, int nt) {
     }
 }
 
+// Populate the productions of the grammar
 void populate_productions(gram_t *gram) {
+
+    // Add the non-terminals
+    // Create productions for each Non-Terminal
     nt_t *nonterm = add_nonterminal(gram, PROGRAM);
     prod_t *prod = create_production();
     add_right(prod, OTHERFUNCTIONS, PROGRAM);

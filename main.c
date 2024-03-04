@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
-
 #include "grammar.h"
 #include "hash_table.h"
 #include "helper.h"
@@ -11,11 +10,13 @@
 #include "parser.h"
 
 int main(int argc, char* argv[]) {
+    //Check for the number of arguments 
     if (argc != 3) {
         printf("Invalid number of arguments. Expected 3 got %d\n", argc);
         exit(-1);
     }
 
+    //Check if the input file exists
     if (access(argv[1], F_OK) == -1) {
         printf(ANSI_COLOR_RED ANSI_COLOR_BOLD
                "File %s does not exist\n" ANSI_COLOR_RESET,
@@ -23,6 +24,7 @@ int main(int argc, char* argv[]) {
         exit(-1);
     }
 
+    //Create Symbol Table
     ht_t* symbol_table = create_hash_table();
     populate_symbol_table(symbol_table);
 
@@ -49,6 +51,7 @@ int main(int argc, char* argv[]) {
         "---------------------------------------------------------------------"
         "\n\n" ANSI_COLOR_RESET);
 
+    // Determine the operation to be performed
     int op;
 take_input:
     printf("Input the Operation:\n");
@@ -56,15 +59,20 @@ take_input:
     printf("\n\n");
 
     switch (op) {
+        // Exit
         case 0: {
             printf(ANSI_COLOR_GREEN ANSI_COLOR_BOLD
                    "Exit Requested. Bye\n\n" ANSI_COLOR_RESET);
             return 0;
         }
+
+        // Remove Comments
         case 1: {
             removeComments(argv[1], argv[2]);
             break;
         }
+
+        // Lexical Analysis
         case 2: {
             tokeninfo_t ret_token;
             bool err_flag = false;
@@ -81,6 +89,8 @@ take_input:
                        "Reported\n\n" ANSI_COLOR_RESET);
             break;
         }
+
+        // Lexical, Syntax Analysis and Print Parse Tree
         case 3: {
             gram_t* gram = create_grammar();
 
@@ -95,6 +105,8 @@ take_input:
             printParseTree(parse_tree, argv[2]);
             break;
         }
+
+        // Time the Lexical, Syntax Analysis and Print Parse Tree
         case 4: {
             clock_t start_time, end_time;
             double total_cpu_time, total_cpu_time_in_seconds;
@@ -133,6 +145,8 @@ take_input:
                    "\n\n" ANSI_COLOR_RESET);
             break;
         }
+
+        // Take input again for invalid input
         default: {
             printf("Invalid Input\n");
             goto take_input;

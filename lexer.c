@@ -12,6 +12,8 @@
 #include "lexerDef.h"
 #include "transition_diagram.h"
 
+
+// populate the twin buffers with the next set of characters
 int populate_twin_buffers(int begin, int forward, char* buffer, int* fptr,
                           int* prev_buf, bool is_swap) {
     int active = begin / BUF_SIZE;
@@ -27,6 +29,7 @@ int populate_twin_buffers(int begin, int forward, char* buffer, int* fptr,
     return read(*fptr, buffer + (BUF_SIZE * next), BUF_SIZE);
 }
 
+// print the lexical output
 void print_lexical_op(tokeninfo_t* tk_info) {
     printf("Line No. %d\t|", tk_info->line_no);
     if (tk_info->token_type < -1) {
@@ -56,6 +59,7 @@ void print_lexical_op(tokeninfo_t* tk_info) {
     printf("  Lexeme '%s'\n", tk_info->lexeme);
 }
 
+// get the next token from the input file
 tokeninfo_t getNextToken(char* ip_filename, ht_t* symbol_table) {
     static unsigned int begin = 0;
     static unsigned int forward = 0;
@@ -165,6 +169,7 @@ start_parsing:
         }
     }
 
+    // Token Found
     int token = td[curr_state]->token;
     forward -= td[curr_state]->retract - 1;
     int val_len = forward - begin + 1;
