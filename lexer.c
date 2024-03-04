@@ -30,9 +30,9 @@ int populate_twin_buffers(int begin, int forward, char* buffer, int* fptr,
 }
 
 // print the lexical output
-void print_lexical_op(tokeninfo_t* tk_info) {
-    printf("Line No. %d\t|", tk_info->line_no);
+void print_lexical_op(tokeninfo_t* tk_info, bool parse) {
     if (tk_info->token_type < -1) {
+        printf("Line No. %d\t|", tk_info->line_no);
         printf(ANSI_COLOR_RED "  LEXICAL ERROR! Pattern <%s>:",
                tk_info->lexeme);
         switch (tk_info->token_type) {
@@ -55,12 +55,16 @@ void print_lexical_op(tokeninfo_t* tk_info) {
         }
         return;
     }
-    printf("  Token %-20s|", token_str[tk_info->token_type]);
-    printf("  Lexeme '%s'\n", tk_info->lexeme);
+    
+    if(!parse) {
+        printf("Line No. %d\t|", tk_info->line_no);
+        printf("  Token %-20s|", token_str[tk_info->token_type]);
+        printf("  Lexeme '%s'\n", tk_info->lexeme);
+    }
 }
 
 // get the next token from the input file
-tokeninfo_t getNextToken(char* ip_filename, ht_t* symbol_table) {
+tokeninfo_t getNextToken(char* ip_filename, ht_t* symbol_table, bool parse) {
     static unsigned int begin = 0;
     static unsigned int forward = 0;
     static int res_read;
@@ -128,9 +132,9 @@ start_parsing:
                                             &prev_buf, is_swap);
             if (tmp == -2) {
                 printf(ANSI_COLOR_RED
-                       "Lexeme greater that 1024 characters exists at line "
+                       "Lexeme greater that %d characters exists at line "
                        "number: %d\n" ANSI_COLOR_RESET,
-                       line_number);
+                       TBUF_SIZE, line_number);
                 exit(-1);
             }
             if (tmp != -1) {
@@ -149,7 +153,7 @@ start_parsing:
             ret_token.line_no = line_number;
             ret_token.lexeme = (char*)malloc(sizeof(char) * val_len);
             strcpy(ret_token.lexeme, value);
-            print_lexical_op(&ret_token);
+            print_lexical_op(&ret_token, parse);
             return ret_token;
         } else if (!td[curr_state]->is_final) {
             forward = (forward + 1) % TBUF_SIZE;
@@ -157,9 +161,9 @@ start_parsing:
                                             &prev_buf, is_swap);
             if (tmp == -2) {
                 printf(ANSI_COLOR_RED
-                       "Lexeme greater that 1024 characters exists at line "
+                       "Lexeme greater that %d characters exists at line "
                        "number: %d\n" ANSI_COLOR_RESET,
-                       line_number);
+                       TBUF_SIZE, line_number);
                 exit(-1);
             }
             if (tmp != -1) {
@@ -184,9 +188,9 @@ start_parsing:
                                     is_swap);
     if (tmp == -2) {
         printf(ANSI_COLOR_RED
-               "Lexeme greater that 1024 characters exists at line "
-               "number: %d\n" ANSI_COLOR_RESET,
-               line_number);
+                       "Lexeme greater that %d characters exists at line "
+                       "number: %d\n" ANSI_COLOR_RESET,
+                       TBUF_SIZE, line_number);
         exit(-1);
     }
 
@@ -258,26 +262,32 @@ start_parsing:
     ret_token.line_no = line_number;
     ret_token.lexeme = (char*)malloc(sizeof(char) * val_len);
     strcpy(ret_token.lexeme, value);
-    print_lexical_op(&ret_token);
+    print_lexical_op(&ret_token, parse);
     return ret_token;
 }
 
-void removeComments(char* ipfile, char* opfile) {
+void removeComments(char* ipfile) {
     bool is_comment = false;
     bool is_new_line = true;
     FILE* fin = fopen(ipfile, "r");
-    FILE* fout = fopen(opfile, "w+");
     char c = fgetc(fin);
+
+    printf(ANSI_COLOR_GREEN ANSI_COLOR_BOLD
+                   "Code After removal of comments\n"
+                   "-----------------------------------------------------------"
+                   "----------"
+                   "\n\n" ANSI_COLOR_RESET);
 
     while (c != EOF) {
         if (c == '%') {
             is_comment = true;
             if (!is_new_line) {
-                fputc('\n', fout);
+                printf("\n");
             }
         }
 
-        if (!is_comment) fputc(c, fout);
+        if (!is_comment) //fputc(c, fout);
+            printf("%c", c);
 
         if (c == '\n') {
             is_comment = false;
@@ -288,4 +298,10 @@ void removeComments(char* ipfile, char* opfile) {
 
         c = fgetc(fin);
     }
+
+    printf(ANSI_COLOR_GREEN ANSI_COLOR_BOLD
+                   "\n"
+                   "-----------------------------------------------------------"
+                   "----------"
+                   "\n" ANSI_COLOR_RESET);
 }

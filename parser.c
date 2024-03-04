@@ -162,7 +162,7 @@ void clear_tree(tree_t *tree) {
 
 // parse the input source code
 tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
-    tokeninfo_t ret_token = getNextToken(src_filename, symbol_table);
+    tokeninfo_t ret_token = getNextToken(src_filename, symbol_table, 1);
     bool lerr_flag = false;
     bool perr_flag = false;
 
@@ -177,7 +177,7 @@ tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
 
     while (ret_token.token_type != -1 && stack->size > 1) {
         if (ret_token.token_type < -1) {
-            ret_token = getNextToken(src_filename, symbol_table);
+            ret_token = getNextToken(src_filename, symbol_table, 1);
             new_token = 1;
             lerr_flag = true;
             continue;
@@ -197,7 +197,7 @@ tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
                         ret_token.line_no, token_str[ret_token.token_type],
                         ret_token.lexeme,
                         non_terminals[curr_node->val - NUM_NONTERMINALS]);
-                ret_token = getNextToken(src_filename, symbol_table);
+                ret_token = getNextToken(src_filename, symbol_table, 1);
                 new_token = 1;
                 perr_flag = true;
             }
@@ -249,7 +249,7 @@ tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
         else {
             pop(stack);
             if (curr_node->val == ret_token.token_type) {
-                ret_token = getNextToken(src_filename, symbol_table);
+                ret_token = getNextToken(src_filename, symbol_table, 1);
                 new_token = 1;
             } else {
                 if (new_token > 0)

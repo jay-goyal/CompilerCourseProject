@@ -68,7 +68,7 @@ take_input:
 
         // Remove Comments
         case 1: {
-            removeComments(argv[1], argv[2]);
+            removeComments(argv[1]);
             break;
         }
 
@@ -77,7 +77,7 @@ take_input:
             tokeninfo_t ret_token;
             bool err_flag = false;
             do {
-                ret_token = getNextToken(argv[1], symbol_table);
+                ret_token = getNextToken(argv[1], symbol_table, 0);
                 if (ret_token.token_type < -2) err_flag = true;
             } while (ret_token.token_type != -1);
             if (err_flag)
