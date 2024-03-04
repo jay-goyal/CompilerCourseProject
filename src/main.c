@@ -32,9 +32,14 @@ take_input:
         }
         case 2: {
             tokeninfo_t ret_token;
+            bool err_flag = false;
             do {
                 ret_token = get_next_token(argv[1], symbol_table, argv[2]);
+                if (ret_token.token_type < -2) err_flag = true;
             } while (ret_token.token_type != -1);
+            if (err_flag)
+                printf(ANSI_COLOR_RED ANSI_COLOR_BOLD
+                       "\n\nLexical Errors Reported\n\n" ANSI_COLOR_RESET);
             break;
         }
         case 3: {

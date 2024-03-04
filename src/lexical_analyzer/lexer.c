@@ -38,7 +38,12 @@ void print_lexical_op(int opfptr, tokeninfo_t* tk_info) {
                 break;
             case -3:
                 printf(
-                    " Lexeme length exceeds max length of 20 "
+                    " Variable Identifier length exceeds max length of 20 "
+                    "characters\n" ANSI_COLOR_RESET);
+                break;
+            case -4:
+                printf(
+                    " Function Identifier length exceeds max length of 30 "
                     "characters\n" ANSI_COLOR_RESET);
                 break;
             default:
@@ -214,8 +219,11 @@ start_parsing:
             case TK_FIELDID:
             case TK_ID:
             case TK_RUID: {
-                if (val_len > 20) {
+                if (token == TK_ID && val_len > 20) {
                     ret_token.token_type = -3;
+                    break;
+                } else if (token == TK_FUNID && val_len > 30) {
+                    ret_token.token_type = -4;
                     break;
                 }
                 char* val_heap = (char*)calloc(val_len, sizeof(char));
