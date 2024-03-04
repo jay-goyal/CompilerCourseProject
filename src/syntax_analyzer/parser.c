@@ -3,6 +3,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include "../helper.h"
+
 pt_t create_parse_table(gram_t *gram, set_t **first_sets, set_t **follow_sets) {
     pt_t pt;
     pt.table = (prod_t ***)calloc(NUM_NONTERMINALS, sizeof(prod_t **));
@@ -159,22 +161,21 @@ tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table,
     push(stack, node);
     parse_tree->root = node;
 
-    while (ret_token.token_type != -1) {
+    while (ret_token.token_type != -1 && stack->size > 1) {
         if (ret_token.token_type == -2) {
             ret_token =
                 get_next_token(src_filename, symbol_table, lexer_op_file);
             continue;
         }
 
-        if (stack->size == 1) {
-            break;
-        }
         tnode_t *curr_node = top(stack);
         if (curr_node->val >= NUM_TERMINALS) {
             // error -> skip
             if (pt.table[curr_node->val - NUM_TERMINALS]
                         [ret_token.token_type + 1] == NULL) {
-                printf("Line No. %d\t|  SYNTAX ERROR! at token type %s\n",
+                printf("Line No. %d\t|" ANSI_COLOR_RED
+                       "  SYNTAX ERROR! at token type "
+                       "%s\n" ANSI_COLOR_RESET,
                        ret_token.line_no, token_str[ret_token.token_type]);
                 ret_token =
                     get_next_token(src_filename, symbol_table, lexer_op_file);
@@ -184,7 +185,9 @@ tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table,
                              [ret_token.token_type + 1]
                                  ->num_right == 0) {
                 pop(stack);
-                printf("Line No. %d\t|  SYNTAX ERROR! at token type %s\n",
+                printf("Line No. %d\t|" ANSI_COLOR_RED
+                       "  SYNTAX ERROR! at token type "
+                       "%s\n" ANSI_COLOR_RESET,
                        ret_token.line_no, token_str[ret_token.token_type]);
             } else {
                 pop(stack);
@@ -220,18 +223,26 @@ tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table,
                 ret_token =
                     get_next_token(src_filename, symbol_table, lexer_op_file);
             } else {
-                printf("Line No. %d\t|  SYNTAX ERROR! Expected Token %s\n",
+                printf("Line No. %d\t|" ANSI_COLOR_RED
+                       "  SYNTAX ERROR! Expected Token "
+                       "%s\n" ANSI_COLOR_RESET,
                        ret_token.line_no, token_str[ret_token.token_type]);
             }
         }
     }
-    if (ret_token.token_type >= 0)
-        ret_token = get_next_token(src_filename, symbol_table, lexer_op_file);
+
     if (ret_token.token_type == -1) {
-        printf("Parse Successful\n");
+        printf(ANSI_COLOR_GREEN ANSI_COLOR_BOLD
+               "\n\nParse Successful\n" ANSI_COLOR_RESET);
     } else {
         if (ret_token.token_type >= 0)
-            printf("Lexical Error, Parser could not be run\n");
+            printf("Line No. %d\t|" ANSI_COLOR_RED
+                   "  SYNTAX ERROR! No Token Expected"
+                   "\n" ANSI_COLOR_RESET,
+                   ret_token.line_no);
+        printf(ANSI_COLOR_RED ANSI_COLOR_BOLD
+               "\n\nSyntax Error, Tokens after _main function provided "
+               "run\n\n" ANSI_COLOR_RESET);
         exit(-1);
     }
 

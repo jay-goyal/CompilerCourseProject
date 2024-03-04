@@ -72,9 +72,18 @@ take_input:
             end_time = clock();
             total_cpu_time = (double)(end_time - start_time);
             total_cpu_time_in_seconds = total_cpu_time / CLOCKS_PER_SEC;
-            printf("Total CPU Time: %f\n", total_cpu_time);
-            printf("Total CPU Time in Seconds: %f\n",
+            printf(ANSI_COLOR_GREEN ANSI_COLOR_BOLD
+                   "\n---------------------------------------------------"
+                   "\n" ANSI_COLOR_RESET);
+            printf(ANSI_COLOR_GREEN ANSI_COLOR_BOLD
+                   "Total CPU Time: %f\n" ANSI_COLOR_RESET,
+                   total_cpu_time);
+            printf(ANSI_COLOR_GREEN ANSI_COLOR_BOLD
+                   "Total CPU Time in Seconds: %f\n" ANSI_COLOR_RESET,
                    total_cpu_time_in_seconds);
+            printf(ANSI_COLOR_GREEN ANSI_COLOR_BOLD
+                   "---------------------------------------------------"
+                   "\n\n" ANSI_COLOR_RESET);
             break;
         }
         default: {

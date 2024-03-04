@@ -8,6 +8,7 @@
 #include <strings.h>
 #include <unistd.h>
 
+#include "../helper.h"
 #include "lexer_types.h"
 #include "transition_diagram.h"
 
@@ -29,16 +30,19 @@ int populate_twin_buffers(int begin, int forward, char* buffer, int* fptr,
 void print_lexical_op(int opfptr, tokeninfo_t* tk_info) {
     printf("Line No. %d\t|", tk_info->line_no);
     if (tk_info->token_type < -1) {
-        printf("  Lexical error for pattern '%s'.", tk_info->lexeme);
+        printf(ANSI_COLOR_RED "  LEXICAL ERROR! Pattern <%s>:",
+               tk_info->lexeme);
         switch (tk_info->token_type) {
             case -2:
-                printf(" Invalid lexeme\n");
+                printf(" Invalid lexeme\n" ANSI_COLOR_RESET);
                 break;
             case -3:
-                printf(" Lexeme length exceeds max length of 20 characters\n");
+                printf(
+                    " Lexeme length exceeds max length of 20 "
+                    "characters\n" ANSI_COLOR_RESET);
                 break;
             default:
-                printf("Internal Error. Bye");
+                printf("Internal Error. Bye" ANSI_COLOR_RESET);
                 exit(-1);
         }
         return;
@@ -122,10 +126,10 @@ start_parsing:
             int tmp = populate_twin_buffers(begin, forward, buffer, &ip_fptr,
                                             &prev_buf, is_swap);
             if (tmp == -2) {
-                printf(
-                    "Lexeme greater that 1024 characters exists at line "
-                    "number: %d\n",
-                    line_number);
+                printf(ANSI_COLOR_RED
+                       "Lexeme greater that 1024 characters exists at line "
+                       "number: %d\n" ANSI_COLOR_RESET,
+                       line_number);
                 exit(-1);
             }
             if (tmp != -1) {
@@ -151,10 +155,10 @@ start_parsing:
             int tmp = populate_twin_buffers(begin, forward, buffer, &ip_fptr,
                                             &prev_buf, is_swap);
             if (tmp == -2) {
-                printf(
-                    "Lexeme greater that 1024 characters exists at line "
-                    "number: %d\n",
-                    line_number);
+                printf(ANSI_COLOR_RED
+                       "Lexeme greater that 1024 characters exists at line "
+                       "number: %d\n" ANSI_COLOR_RESET,
+                       line_number);
                 exit(-1);
             }
             if (tmp != -1) {
@@ -177,10 +181,10 @@ start_parsing:
     int tmp = populate_twin_buffers(begin, forward, buffer, &ip_fptr, &prev_buf,
                                     is_swap);
     if (tmp == -2) {
-        printf(
-            "Lexeme greater that 1024 characters exists at line "
-            "number: %d\n",
-            line_number);
+        printf(ANSI_COLOR_RED
+               "Lexeme greater that 1024 characters exists at line "
+               "number: %d\n" ANSI_COLOR_RESET,
+               line_number);
         exit(-1);
     }
 
