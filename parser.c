@@ -212,11 +212,11 @@ tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
                     printf(
                         "Line No. %d\t|" ANSI_COLOR_RED
                         "  SYNTAX ERROR! Unexpected token %s encountered with "
-                        "value '%s' "
+                        "value '%s' stack top '%s' "
                         "\n" ANSI_COLOR_RESET,
                         ret_token.line_no, token_str[ret_token.token_type],
                         ret_token.lexeme,
-                        non_terminals[curr_node->val - NUM_NONTERMINALS]);
+                        non_terminals[curr_node->val - NUM_TERMINALS]);
                 ret_token = getNextToken(src_filename, symbol_table, 1, true);
                 err = 0;
                 perr_flag = true;
@@ -230,11 +230,11 @@ tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
                     printf(
                         "Line No. %d\t|" ANSI_COLOR_RED
                         "  SYNTAX ERROR! Unexpected token %s encountered with "
-                        "value '%s' "
+                        "value '%s' stack top '%s' "
                         "\n" ANSI_COLOR_RESET,
-                        ret_token.line_no, token_str[ret_token.token_type],
+                        ret_token.line_no, token_str[ret_token.token_type], 
                         ret_token.lexeme,
-                        non_terminals[curr_node->val - NUM_NONTERMINALS]);
+                        non_terminals[curr_node->val - NUM_TERMINALS]);
                 perr_flag = true;
                 err = 1;
             } else {
