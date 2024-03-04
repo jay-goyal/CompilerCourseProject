@@ -2,12 +2,12 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "hash_table/hash_table.h"
+#include "grammar.h"
+#include "hash_table.h"
 #include "helper.h"
-#include "lexical_analyzer/lexer.h"
-#include "lexical_analyzer/lexer_types.h"
-#include "syntax_analyzer/grammar.h"
-#include "syntax_analyzer/parser.h"
+#include "lexer.h"
+#include "lexer_types.h"
+#include "parser.h"
 
 int main(int argc, char* argv[]) {
     if (argc != 3) {

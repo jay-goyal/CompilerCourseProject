@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 
-#include "lexical_analyzer/lexer_types.h"
+#include "lexer_types.h"
 
 void populate_symbol_table(ht_t* st) {
     stentry_t* entry = (stentry_t*)calloc(1, sizeof(stentry_t));

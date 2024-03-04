@@ -1,7 +1,7 @@
 #ifndef GRAMMAR_H
 #define GRAMMAR_H
 
-#include "../lexical_analyzer/lexer.h"
+#include "lexer.h"
 
 #define PROGRAM 57
 #define MAINFUNCTION 58

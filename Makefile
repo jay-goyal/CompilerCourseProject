@@ -1,7 +1,7 @@
 BUILDDIR := build
 DBGDIR := $(BUILDDIR)/dbg
 TGTDIR := $(BUILDDIR)/target
-SRCDIR := src
+SRCDIR := ./
 INCDIR := include
 
 CC := gcc
@@ -10,20 +10,18 @@ DBGFLAGS := -c -w -O2 -ggdb
 
 SOURCES := $(shell find $(SRCDIR) -type f -iname '*.c')
 HEADERS := $(shell find $(SRCDIR) -type f -iname '*.h')
-TGTOBJ := $(subst src,$(TGTDIR),$(SOURCES:.c=.o))
-DBGOBJ := $(subst src,$(DBGDIR),$(SOURCES:.c=.o))
-TGTDIRS := $(subst src,$(TGTDIR),$(dir $(SOURCES)))
-DBGDIRS := $(subst src,$(DBGDIR),$(dir $(SOURCES)))
+TGTOBJ := $(subst ./,$(TGTDIR)/,$(SOURCES:.c=.o))
+DBGOBJ := $(subst ./,$(DBGDIR)/,$(SOURCES:.c=.o))
 
 build: target
 
 run: target
 	./$(TGTDIR)/compiler $(filter-out $@,$(MAKECMDGOALS))
 
-target: $(TGTDIRS) $(SOURCES) $(HEADERS) $(TGTOBJ)
+target: $(TGTDIR) $(SOURCES) $(HEADERS) $(TGTOBJ)
 	$(CC) -o $(TGTDIR)/compiler $(TGTOBJ)
 
-debug: $(DBGDIRS) $(SOURCES) $(HEADERS) $(DBGOBJ)
+debug: $(DBGDIR) $(SOURCES) $(HEADERS) $(DBGOBJ)
 	$(CC) -o $(DBGDIR)/compiler $(DBGOBJ)
 
 clean:
@@ -35,11 +33,11 @@ $(DBGDIR)/%.o: $(SRCDIR)/%.c $(HEADERS)
 $(TGTDIR)/%.o: $(SRCDIR)/%.c $(HEADERS)
 	$(CC) -o $@ $(CFLAGS) $<
 
-$(TGTDIRS):
-	mkdir -p $(TGTDIRS)
+$(TGTDIR):
+	mkdir -p $(TGTDIR)
 
-$(DBGDIRS):
-	mkdir -p $(DBGDIRS)
+$(DBGDIR):
+	mkdir -p $(DBGDIR)
 
 %:
 	@:

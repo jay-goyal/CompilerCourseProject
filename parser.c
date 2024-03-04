@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "../helper.h"
+#include "helper.h"
 
 pt_t create_parse_table(gram_t *gram, set_t **first_sets, set_t **follow_sets) {
     pt_t pt;

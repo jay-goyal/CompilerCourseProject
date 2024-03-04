@@ -2,8 +2,8 @@
 #define HASH_TABLE_H
 #include <stdbool.h>
 
-#include "../lexical_analyzer/lexer_types.h"
-#include "../linked_list/LinkedList.h"
+#include "LinkedList.h"
+#include "lexer_types.h"
 
 #define TABLE_SIZE 1000
 // #define TABLE_SIZE 7

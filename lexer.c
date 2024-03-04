@@ -8,7 +8,7 @@
 #include <strings.h>
 #include <unistd.h>
 
-#include "../helper.h"
+#include "helper.h"
 #include "lexer_types.h"
 #include "transition_diagram.h"
 
