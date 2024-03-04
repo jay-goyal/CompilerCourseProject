@@ -161,7 +161,8 @@ tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table,
 
     while (ret_token.token_type != -1) {
         if (ret_token.token_type == -2) {
-            ret_token = get_next_token(src_filename, symbol_table, lexer_op_file);
+            ret_token =
+                get_next_token(src_filename, symbol_table, lexer_op_file);
             continue;
         }
 
@@ -173,7 +174,7 @@ tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table,
             // error -> skip
             if (pt.table[curr_node->val - NUM_TERMINALS]
                         [ret_token.token_type + 1] == NULL) {
-                printf("Line No. %d: SYNTAX ERROR! at token type %s\n",
+                printf("Line No. %d\t|  SYNTAX ERROR! at token type %s\n",
                        ret_token.line_no, token_str[ret_token.token_type]);
                 ret_token =
                     get_next_token(src_filename, symbol_table, lexer_op_file);
@@ -183,7 +184,7 @@ tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table,
                              [ret_token.token_type + 1]
                                  ->num_right == 0) {
                 pop(stack);
-                printf("Line No. %d: SYNTAX ERROR! at token type %s\n",
+                printf("Line No. %d\t|  SYNTAX ERROR! at token type %s\n",
                        ret_token.line_no, token_str[ret_token.token_type]);
             } else {
                 pop(stack);
@@ -219,7 +220,7 @@ tree_t *create_parse_tree(pt_t pt, char *src_filename, ht_t *symbol_table,
                 ret_token =
                     get_next_token(src_filename, symbol_table, lexer_op_file);
             } else {
-                printf("Line No. %d: SYNTAX ERROR! Expected Token %s\n",
+                printf("Line No. %d\t|  SYNTAX ERROR! Expected Token %s\n",
                        ret_token.line_no, token_str[ret_token.token_type]);
             }
         }
@@ -245,7 +246,9 @@ void print_node(tnode_t *node, int fptr) {
     // leaf node
     if (num_children == 0) {
         if (node->val == -1) {
-            len = sprintf(buf, "----                 %-4d   EPSILON          ----          %-30s yes      ----\n",
+            len = sprintf(buf,
+                          "----                 %-4d   EPSILON          ----   "
+                          "       %-30s yes      ----\n",
                           node->tokeninfo.line_no,
                           non_terminals[node->parent->val - NUM_TERMINALS]);
             write(fptr, buf, len);
@@ -269,16 +272,19 @@ void print_node(tnode_t *node, int fptr) {
     }
 
     print_node(node->children[0], fptr);
-    len = sprintf(buf, "----                 %-4d   ----             ----   ", node->tokeninfo.line_no);
+    len = sprintf(buf, "----                 %-4d   ----             ----   ",
+                  node->tokeninfo.line_no);
     write(fptr, buf, len);
     if (node->val == PROGRAM) {
         len = sprintf(buf, "       ROOT                          ");
         write(fptr, buf, len);
     } else {
-        len = sprintf(buf, "       %-30s", non_terminals[node->val - NUM_TERMINALS]);
+        len = sprintf(buf, "       %-30s",
+                      non_terminals[node->val - NUM_TERMINALS]);
         write(fptr, buf, len);
     }
-    len = sprintf(buf, " no       %s\n", non_terminals[node->val - NUM_TERMINALS]);
+    len = sprintf(buf, " no       %s\n",
+                  non_terminals[node->val - NUM_TERMINALS]);
     write(fptr, buf, len);
 
     for (int i = 1; i < num_children; i++) {
@@ -289,7 +295,10 @@ void print_node(tnode_t *node, int fptr) {
 void print_parse_tree(tree_t *tree, char *parser_op_file) {
     int fptr = open(parser_op_file, O_RDWR | O_CREAT, 0666);
     char buf[1500];
-    int len = sprintf(buf, "Lexeme               LineNo TokenName        ValueIfNumber Parent                         isLeaf   Node\n");
+    int len =
+        sprintf(buf,
+                "Lexeme               LineNo TokenName        ValueIfNumber "
+                "Parent                         isLeaf   Node\n");
     write(fptr, buf, len);
     print_node(tree->root, fptr);
     close(fptr);

@@ -28,8 +28,19 @@ int populate_twin_buffers(int begin, int forward, char* buffer, int* fptr,
 
 void print_lexical_op(int opfptr, tokeninfo_t* tk_info) {
     printf("Line No. %d\t|", tk_info->line_no);
-    if (tk_info->token_type == -2) {
-        printf("  Lexical error for pattern '%s'\n", tk_info->lexeme);
+    if (tk_info->token_type < -1) {
+        printf("  Lexical error for pattern '%s'.", tk_info->lexeme);
+        switch (tk_info->token_type) {
+            case -2:
+                printf(" Invalid lexeme\n");
+                break;
+            case -3:
+                printf(" Lexeme length exceeds max length of 20 characters\n");
+                break;
+            default:
+                printf("Internal Error. Bye");
+                exit(-1);
+        }
         return;
     }
     printf("  Token %-20s|", token_str[tk_info->token_type]);
@@ -82,6 +93,7 @@ tokeninfo_t get_next_token(char* ip_filename, ht_t* symbol_table,
 start_parsing:
     while (!td[curr_state]->is_final) {
         char curr_char = buffer[forward];
+
         if (curr_char == '\0') {
             is_end = true;
             free(buffer);
@@ -95,13 +107,17 @@ start_parsing:
             ret_token.token_type = -1;
             return ret_token;
         }
+
         curr_state = get_next_state(curr_state, curr_char, td);
+
         if (curr_state == -1) {
-            forward += 1;
             int val_len = forward - begin + 1;
             if (val_len < 0) {
                 val_len = TBUF_SIZE - begin + forward + 1;
+            } else if (val_len == 1) {
+                val_len++;
             }
+            forward += 1;
             forward = forward % TBUF_SIZE;
             int tmp = populate_twin_buffers(begin, forward, buffer, &ip_fptr,
                                             &prev_buf, is_swap);
@@ -110,6 +126,7 @@ start_parsing:
                     "Lexeme greater that 1024 characters exists at line "
                     "number: %d\n",
                     line_number);
+                exit(-1);
             }
             if (tmp != -1) {
                 res_read = tmp;
@@ -138,6 +155,7 @@ start_parsing:
                     "Lexeme greater that 1024 characters exists at line "
                     "number: %d\n",
                     line_number);
+                exit(-1);
             }
             if (tmp != -1) {
                 res_read = tmp;
@@ -149,10 +167,13 @@ start_parsing:
     int token = td[curr_state]->token;
     forward -= td[curr_state]->retract - 1;
     int val_len = forward - begin + 1;
+
     if (val_len < 0) {
         val_len = TBUF_SIZE - begin + forward + 1;
     }
+
     forward = forward % TBUF_SIZE;
+
     int tmp = populate_twin_buffers(begin, forward, buffer, &ip_fptr, &prev_buf,
                                     is_swap);
     if (tmp == -2) {
@@ -160,7 +181,9 @@ start_parsing:
             "Lexeme greater that 1024 characters exists at line "
             "number: %d\n",
             line_number);
+        exit(-1);
     }
+
     if (tmp != -1) {
         res_read = tmp;
         is_swap = true;
@@ -175,31 +198,36 @@ start_parsing:
     if (td[curr_state]->line_increment) line_number++;
 
     if (token >= 0 && token != TK_COMMENT) {
-        ret_token.token_type = token;
-        switch (token) {
-            case TK_NUM:
-                ret_token.info.num_val = atol(value);
-                break;
-            case TK_RNUM:
-                ret_token.info.rnum_val = atof(value);
-                break;
-            case TK_FUNID:
-            case TK_FIELDID:
-            case TK_ID:
-            case TK_RUID: {
-                char* val_heap = (char*)calloc(val_len, sizeof(char));
-                strcpy(val_heap, value);
-                stentry_t* entry = (stentry_t*)calloc(1, sizeof(stentry_t));
-                entry->lexeme = val_heap;
-                entry->token_type = token;
-                stentry_t* existing_entry = insert_entry(symbol_table, entry);
-                if (existing_entry != NULL) {
-                    free(entry);
-                    entry = existing_entry;
+        if (token == TK_ID && val_len > 20) {
+            ret_token.token_type = -3;
+        } else {
+            ret_token.token_type = token;
+            switch (token) {
+                case TK_NUM:
+                    ret_token.info.num_val = atol(value);
+                    break;
+                case TK_RNUM:
+                    ret_token.info.rnum_val = atof(value);
+                    break;
+                case TK_FUNID:
+                case TK_FIELDID:
+                case TK_ID:
+                case TK_RUID: {
+                    char* val_heap = (char*)calloc(val_len, sizeof(char));
+                    strcpy(val_heap, value);
+                    stentry_t* entry = (stentry_t*)calloc(1, sizeof(stentry_t));
+                    entry->lexeme = val_heap;
+                    entry->token_type = token;
+                    stentry_t* existing_entry =
+                        insert_entry(symbol_table, entry);
+                    if (existing_entry != NULL) {
+                        free(entry);
+                        entry = existing_entry;
+                    }
+                    ret_token.token_type = entry->token_type;
+                    ret_token.info.stentry = entry;
+                    break;
                 }
-                ret_token.token_type = entry->token_type;
-                ret_token.info.stentry = entry;
-                break;
             }
         }
     } else {
