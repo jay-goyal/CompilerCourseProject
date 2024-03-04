@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <unistd.h>
 
 #include "hash_table/hash_table.h"
 #include "helper.h"
@@ -14,6 +15,14 @@ int main(int argc, char* argv[]) {
         printf("Invalid number of arguments. Expected 3 got %d\n", argc);
         exit(-1);
     }
+
+    if (access(argv[1], F_OK) == -1) {
+        printf(ANSI_COLOR_RED ANSI_COLOR_BOLD
+               "File %s does not exist\n" ANSI_COLOR_RESET,
+               argv[1]);
+        exit(-1);
+    }
+
     ht_t* symbol_table = create_hash_table();
     populate_symbol_table(symbol_table);
 
