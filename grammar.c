@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 
+#include "helper.h"
 #include "lexerDef.h"
 
 bool visited[NUM_NONTERMINALS] = {0};
@@ -37,6 +38,7 @@ set_t **computeFirstSets(gram_t *gram) {
     for (int i = 0; i < NUM_NONTERMINALS; i++) {
         computeFirst(first_sets, gram, gram->nonterminals[i], i);
     }
+
     return first_sets;
 }
 
@@ -87,23 +89,6 @@ set_t **comuteFollowSets(gram_t *gram, set_t **first_sets) {
         computeFollow(follow_sets, first_sets, gram, gram->nonterminals[i], i);
     }
 
-    // for(int i=0; i<NUM_NONTERMINALS; i++) {
-    //     printf("Follow set for %d: ", i);
-    //     for(int j=0; j<=NUM_TERMINALS+1; j++) {
-    //         if(follow_sets[i]->term[j] == 1) {
-    //             if(j == 0) {
-    //                 printf("EPSILON ");
-    //             }
-    //             else if(j == NUM_TERMINALS+1) {
-    //                 printf("$ ");
-    //             }
-    //             else {
-    //                 printf("%s ", token_str[j-1]);
-    //             }
-    //         }
-    //     }
-    //     printf("\n");
-    // }
     return follow_sets;
 }
 

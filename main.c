@@ -26,13 +26,39 @@ int main(int argc, char* argv[]) {
     ht_t* symbol_table = create_hash_table();
     populate_symbol_table(symbol_table);
 
+    // Print Status of Submission
+    printf(
+        ANSI_COLOR_BLUE ANSI_COLOR_BOLD
+        "\n"
+        "---------------------------------------------------------------------"
+        "\n" ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_BLUE ANSI_COLOR_BOLD
+           "IMPLEMENTATION STATUS:\n" ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_BLUE ANSI_COLOR_BOLD
+           "FIRST and FOLLOW Sets automatically computed\n" ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_BLUE ANSI_COLOR_BOLD
+           "Both Lexical and Syntax Analysis modules "
+           "developed\n" ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_BLUE ANSI_COLOR_BOLD
+           "Parse Tree can be generated\n" ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_BLUE ANSI_COLOR_BOLD
+           "Error Reporting done " ANSI_COLOR_RED
+           "but errors may deviate from ones specified\n" ANSI_COLOR_RESET);
+    printf(
+        ANSI_COLOR_BLUE ANSI_COLOR_BOLD
+        "---------------------------------------------------------------------"
+        "\n\n" ANSI_COLOR_RESET);
+
     int op;
 take_input:
     printf("Input the Operation:\n");
     scanf("%d", &op);
+    printf("\n\n");
 
     switch (op) {
         case 0: {
+            printf(ANSI_COLOR_GREEN ANSI_COLOR_BOLD
+                   "Exit Requested. Bye\n\n" ANSI_COLOR_RESET);
             return 0;
         }
         case 1: {
@@ -49,6 +75,10 @@ take_input:
             if (err_flag)
                 printf(ANSI_COLOR_RED ANSI_COLOR_BOLD
                        "\n\nLexical Errors Reported\n\n" ANSI_COLOR_RESET);
+            else
+                printf(ANSI_COLOR_GREEN ANSI_COLOR_BOLD
+                       "\n\nLexical Analysis Finished. No Errors "
+                       "Reported\n\n" ANSI_COLOR_RESET);
             break;
         }
         case 3: {
@@ -87,7 +117,9 @@ take_input:
             total_cpu_time = (double)(end_time - start_time);
             total_cpu_time_in_seconds = total_cpu_time / CLOCKS_PER_SEC;
             printf(ANSI_COLOR_GREEN ANSI_COLOR_BOLD
-                   "\n---------------------------------------------------"
+                   "\n"
+                   "-----------------------------------------------------------"
+                   "----------"
                    "\n" ANSI_COLOR_RESET);
             printf(ANSI_COLOR_GREEN ANSI_COLOR_BOLD
                    "Total CPU Time: %f\n" ANSI_COLOR_RESET,
@@ -96,7 +128,8 @@ take_input:
                    "Total CPU Time in Seconds: %f\n" ANSI_COLOR_RESET,
                    total_cpu_time_in_seconds);
             printf(ANSI_COLOR_GREEN ANSI_COLOR_BOLD
-                   "---------------------------------------------------"
+                   "-----------------------------------------------------------"
+                   "----------"
                    "\n\n" ANSI_COLOR_RESET);
             break;
         }

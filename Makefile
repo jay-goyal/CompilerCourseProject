@@ -16,16 +16,17 @@ DBGOBJ := $(subst ./,$(DBGDIR)/,$(SOURCES:.c=.o))
 build: target
 
 run: target
-	./$(TGTDIR)/compiler $(filter-out $@,$(MAKECMDGOALS))
+	./stage1exe $(filter-out $@,$(MAKECMDGOALS))
 
 target: $(TGTDIR) $(SOURCES) $(HEADERS) $(TGTOBJ)
-	$(CC) -o $(TGTDIR)/compiler $(TGTOBJ)
+	$(CC) -o ./stage1exe $(TGTOBJ)
 
 debug: $(DBGDIR) $(SOURCES) $(HEADERS) $(DBGOBJ)
-	$(CC) -o $(DBGDIR)/compiler $(DBGOBJ)
+	$(CC) -o $(DBGDIR)/stage1exe $(DBGOBJ)
 
 clean:
-	rm -rf $(BUILDDIR)
+	rm -rf $(BUILDDIR) 
+	rm stage1exe
 
 $(DBGDIR)/%.o: $(SRCDIR)/%.c $(HEADERS)
 	$(CC) -o $@ $(DBGFLAGS) $<
