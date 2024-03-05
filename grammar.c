@@ -55,7 +55,7 @@ set_t **computeFirstSets(gram_t *gram) {
     return first_sets;
 }
 
-// Compute the first set for a non-terminal
+// Compute the first set for a non-terminal as per the algorithm discussed in the class
 void computeFirst(set_t **first_sets, gram_t *gram, nt_t *nonterm,
                   int nt_index) {
     if (visited[nt_index]) {
@@ -67,10 +67,13 @@ void computeFirst(set_t **first_sets, gram_t *gram, nt_t *nonterm,
     for (int i = 0; i < num_prod; i++) {
         for (int k = 0; k < nonterm->productions[i]->num_right; k++) {
             int symb = nonterm->productions[i]->right[k];
+            // add the terminal, if present in first set
             if (symb <= NUM_TERMINALS) {
                 first_sets[nt_index]->term[symb + 1] = 1;
                 break;
-            } else {
+            } 
+            // if right side is a non-terminal, add the first of the non-terminal
+            else {
                 computeFirst(first_sets, gram,
                              gram->nonterminals[symb - NUM_TERMINALS],
                              symb - NUM_TERMINALS);
@@ -107,7 +110,7 @@ set_t **comuteFollowSets(gram_t *gram, set_t **first_sets) {
     return follow_sets;
 }
 
-// Compute the follow set for a non-terminal
+// Compute the follow set for a non-terminal as per the algorithm discussed in the class
 void computeFollow(set_t **follow_sets, set_t **first_sets, gram_t *gram,
                    nt_t *nonterm, int nt_index) {
     if (visited[nt_index]) {
@@ -117,10 +120,11 @@ void computeFollow(set_t **follow_sets, set_t **first_sets, gram_t *gram,
     visited[nt_index] = true;
     int num_prod = nonterm->num_prod;
     if (nt_index == 0) {
-        // bottom marker
+        // always include bottom marker
         follow_sets[nt_index]->term[NUM_TERMINALS + 1] = 1;
     }
 
+    // for all productions, if A -> alphaBbeta, add first(beta) to follow(B)
     for (int i = 0; i < NUM_NONTERMINALS; i++) {
         if (occur[nt_index][i] == 1) {
             int num_prod = gram->nonterminals[i]->num_prod;

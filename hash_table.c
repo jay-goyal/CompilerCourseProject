@@ -57,14 +57,20 @@ stentry_t* insert_entry(ht_t* hashtable, stentry_t* key) {
     unsigned int hash_value = hash(key->lexeme);
     node_t** entries = hashtable->entries;
     node_t* node = check_node_exists(hashtable, key);
+
+    // if node existed, don't insert and return existing node
     if (node != NULL) {
         return node->key;
     }
+
+    // if head did not exist, create a new linked list
     if (entries[hash_value] == NULL) {
         node = make_node(key);
         entries[hash_value] = node;
         return NULL;
     }
+
+    // insert existing node
     node = insert_tail_node(entries[hash_value], key);
     return NULL;
 }

@@ -18,7 +18,7 @@ ARYAN BANSAL - 2021A7PS2776P
 
 #include "helper.h"
 
-// create parse table
+// create predictive parse table
 pt_t createParseTable(gram_t *gram, set_t **first_sets, set_t **follow_sets) {
     pt_t pt;
     pt.table = (prod_t ***)calloc(NUM_NONTERMINALS, sizeof(prod_t **));
@@ -33,6 +33,8 @@ pt_t createParseTable(gram_t *gram, set_t **first_sets, set_t **follow_sets) {
                 pt.table[i][j] = synch;
             }
         }
+
+        // include these tokens in the syn set for each non-terminal
         pt.table[i][TK_SEM + 1] = synch;
         pt.table[i][TK_END + 1] = synch;
         pt.table[i][TK_ENDRECORD + 1] = synch;
@@ -44,6 +46,7 @@ pt_t createParseTable(gram_t *gram, set_t **first_sets, set_t **follow_sets) {
         pt.table[i][TK_SQR + 1] = synch;
     }
 
+    // creating table as per the algorithm discussed in the class
     for (int i = 0; i < NUM_NONTERMINALS; i++) {
         int num_prod = gram->nonterminals[i]->num_prod;
         for (int k = 0; k < num_prod; k++) {
@@ -52,6 +55,8 @@ pt_t createParseTable(gram_t *gram, set_t **first_sets, set_t **follow_sets) {
             bool flag = 0;
             for (int l = 0; l < num_right; l++) {
                 int right = gram->nonterminals[i]->productions[k]->right[l];
+
+                // epsilon production added corresponding to each terminal in the follow set
                 if (right == -1) {
                     for (int m = 1; m <= NUM_TERMINALS + 1; m++) {
                         if (follow_sets[i]->term[m] == 1) {
@@ -60,12 +65,16 @@ pt_t createParseTable(gram_t *gram, set_t **first_sets, set_t **follow_sets) {
                         }
                     }
                     flag = 1;
-                } else if (right < NUM_TERMINALS) {
+                } 
+                // production results in a token
+                else if (right < NUM_TERMINALS) {
                     pt.table[i][right + 1] =
                         gram->nonterminals[i]->productions[k];
                     flag = 1;
                     break;
-                } else if (right >= NUM_TERMINALS) {
+                } 
+                // non-terminal
+                else if (right >= NUM_TERMINALS) {
                     for (int j = 1; j <= NUM_TERMINALS; j++) {
                         if (first_sets[right - NUM_TERMINALS]->term[j] == 1) {
                             pt.table[i][j] =
@@ -92,6 +101,7 @@ pt_t createParseTable(gram_t *gram, set_t **first_sets, set_t **follow_sets) {
     return pt;
 }
 
+// clear parse table
 void clear_parse_table(pt_t pt) {
     free(pt.table[0][TK_SEM + 1]);
     for (int i = 0; i < NUM_NONTERMINALS; i++) {
@@ -146,6 +156,7 @@ tree_t *create_tree() {
     return tree;
 }
 
+// create node for the tree
 tnode_t *create_tnode(int val, tokeninfo_t tokeninfo) {
     tnode_t *node = (tnode_t *)calloc(1, sizeof(tnode_t));
     node->val = val;
@@ -156,6 +167,7 @@ tnode_t *create_tnode(int val, tokeninfo_t tokeninfo) {
     return node;
 }
 
+// insert a child node
 void insert_tnode(tnode_t *parent, tnode_t *child) {
     parent->num_children++;
     parent->children = (tnode_t **)realloc(
@@ -205,8 +217,10 @@ tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
         }
 
         tnode_t *curr_node = top(stack);
+
+        // top of the stack is a non-temrinal
         if (curr_node->val >= NUM_TERMINALS) {
-            // error -> skip
+            // error -> skip (no corresponding production in parse table)
             if (pt.table[curr_node->val - NUM_TERMINALS]
                         [ret_token.token_type + 1] == NULL) {
                 if (!err)
@@ -222,7 +236,7 @@ tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
                 err = 0;
                 perr_flag = true;
             }
-            // synch -> error recovery
+            // synch -> panic mode error recovery
             else if (pt.table[curr_node->val - NUM_TERMINALS]
                              [ret_token.token_type + 1]
                                  ->num_right == 0) {
@@ -265,6 +279,7 @@ tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
                 }
             }
         }
+
         // top is a terminal
         else {
             pop(stack);
@@ -272,7 +287,9 @@ tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
                 curr_node->tokeninfo = ret_token;
                 ret_token = getNextToken(src_filename, symbol_table, 1, true);
                 err = 0;
-            } else {
+            } 
+            // token present at top of the stack doesn't match with input symbol
+            else {
                 if (!err)
                     printf(
                         "Line No. %d\t|" ANSI_COLOR_RED

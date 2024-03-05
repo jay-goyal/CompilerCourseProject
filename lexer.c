@@ -30,6 +30,8 @@ int populate_twin_buffers(int begin, int forward, char* buffer, int* fptr,
     if (next == *prev_buf || next == active) {
         return -1;
     }
+
+    // if a lexeme, not a comment, is greater than size of one buffer, return error
     if (is_swap && curr_state != 33) {
         return -2;
     }
@@ -87,6 +89,7 @@ tokeninfo_t getNextToken(char* ip_filename, ht_t* symbol_table, bool parse,
     static int prev_buf = 0;
     tokeninfo_t ret_token = {0, {0}};
     bool is_swap = false;
+
     if (!is_lexer_init) {
         buffer = (char*)calloc(TBUF_SIZE, sizeof(char));
         ip_fptr = open(ip_filename, O_RDONLY);
@@ -119,6 +122,7 @@ start_parsing:
     while (!td[curr_state]->is_final) {
         char curr_char = buffer[forward];
 
+        // Null character being the first character of a lexeme means the parsing is finished
         if (curr_char == '\0' && forward == begin) {
             is_end = true;
             free(buffer);
@@ -300,7 +304,7 @@ void removeComments(char* ipfile) {
             }
         }
 
-        if (!is_comment)  // fputc(c, fout);
+        if (!is_comment)
             printf("%c", c);
 
         if (c == '\n') {

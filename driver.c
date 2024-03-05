@@ -112,6 +112,7 @@ take_input:
                        "\nLexical Analysis Finished. No Errors "
                        "Reported\n" ANSI_COLOR_RESET);
 
+            // clear symbol table and repopulate
             free(symbol_table);
             symbol_table = create_hash_table();
             populate_symbol_table(symbol_table);
@@ -126,6 +127,7 @@ take_input:
                 parseInputSourceCode(pt, argv[1], symbol_table);
             printParseTree(parse_tree, argv[2]);
 
+            // clear symbol table and repopulate
             free(symbol_table);
             symbol_table = create_hash_table();
             populate_symbol_table(symbol_table);
@@ -149,6 +151,7 @@ take_input:
                 (double)(end_time - start_time) + gen_total_cpu_time;
             total_cpu_time_in_seconds = total_cpu_time / CLOCKS_PER_SEC;
 
+            // clear symbol table and repopulate
             free(symbol_table);
             symbol_table = create_hash_table();
             populate_symbol_table(symbol_table);
