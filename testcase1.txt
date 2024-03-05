@@ -119,6 +119,24 @@ output parameter list [real c6];
 	return [c6];
 end
 
+% The following function computes another different function value for the given inputs 
+_computeAADFunctionValue input parameter list[int c3, int c4, int c5]
+output parameter list [real c6];
+	type real : d4cbcd5677;
+	type real : c4bbb;
+	c6 <--- 5000.79;
+	d4cbcd5677<--- ((c3 + 2*c4)-(c5-5))/ 4;
+	c4bbb <--- ((d4cbcd5677- 2065)*(233.45-234*8))+5*c3;
+	if((~(c4bbb == 900)) &&& (c4bbb > 178.66)) 
+	then
+		c6<--- d4cbcd5677/c4bbb;
+	else
+		write(c4bbb);
+	endif
+
+	return [c6];
+end
+
 % type checking will be required in stage 2. Despite some type errors, undeclared variables etc the code is syntactically correct
 %in this function.
 _main 
