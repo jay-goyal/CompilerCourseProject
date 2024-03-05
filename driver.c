@@ -116,6 +116,7 @@ take_input:
 
         // Lexical, Syntax Analysis and Print Parse Tree
         case 3: {
+            fclose(fopen(argv[2], "w"));
             tree_t* parse_tree =
                 parseInputSourceCode(pt, argv[1], symbol_table);
             printParseTree(parse_tree, argv[2]);
@@ -124,6 +125,7 @@ take_input:
 
         // Time the Lexical, Syntax Analysis and Print Parse Tree
         case 4: {
+            fclose(fopen(argv[2], "w"));
             clock_t start_time, end_time;
             double total_cpu_time, total_cpu_time_in_seconds;
             start_time = clock();

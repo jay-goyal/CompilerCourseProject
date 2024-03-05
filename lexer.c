@@ -119,7 +119,7 @@ start_parsing:
     while (!td[curr_state]->is_final) {
         char curr_char = buffer[forward];
 
-        if (curr_char == '\0') {
+        if (curr_char == '\0' && forward == begin) {
             is_end = true;
             free(buffer);
             close(ip_fptr);
