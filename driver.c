@@ -43,6 +43,7 @@ int main(int argc, char* argv[]) {
     ht_t* symbol_table = create_hash_table();
     populate_symbol_table(symbol_table);
 
+    // Create Grammar, First and Follow Sets and Predictive Parsing Table
     gram_t* gram = create_grammar();
     set_t** first_sets = computeFirstSets(gram);
     set_t** follow_sets = comuteFollowSets(gram, first_sets);
@@ -72,12 +73,12 @@ int main(int argc, char* argv[]) {
     printf(
         ANSI_COLOR_BLUE ANSI_COLOR_BOLD
         "---------------------------------------------------------------------"
-        "\n\n" ANSI_COLOR_RESET);
+        "\n" ANSI_COLOR_RESET);
 
     // Determine the operation to be performed
     int op;
 take_input:
-    printf("Input the Operation:\n");
+    printf("\nInput the Operation:\n");
     scanf("%d", &op);
     switch (op) {
         // Exit
@@ -105,11 +106,15 @@ take_input:
             }
             if (err_flag)
                 printf(ANSI_COLOR_RED ANSI_COLOR_BOLD
-                       "\n\nLexical Errors Reported\n\n" ANSI_COLOR_RESET);
+                       "\nLexical Errors Reported\n" ANSI_COLOR_RESET);
             else
                 printf(ANSI_COLOR_GREEN ANSI_COLOR_BOLD
-                       "\n\nLexical Analysis Finished. No Errors "
-                       "Reported\n\n" ANSI_COLOR_RESET);
+                       "\nLexical Analysis Finished. No Errors "
+                       "Reported\n" ANSI_COLOR_RESET);
+
+            free(symbol_table);
+            symbol_table = create_hash_table();
+            populate_symbol_table(symbol_table);
 
             goto take_input;
         }
@@ -120,6 +125,13 @@ take_input:
             tree_t* parse_tree =
                 parseInputSourceCode(pt, argv[1], symbol_table);
             printParseTree(parse_tree, argv[2]);
+
+            free(symbol_table);
+            symbol_table = create_hash_table();
+            populate_symbol_table(symbol_table);
+
+            clear_tree(parse_tree);
+
             goto take_input;
         }
 
@@ -137,13 +149,16 @@ take_input:
                 (double)(end_time - start_time) + gen_total_cpu_time;
             total_cpu_time_in_seconds = total_cpu_time / CLOCKS_PER_SEC;
 
+            free(symbol_table);
+            symbol_table = create_hash_table();
+            populate_symbol_table(symbol_table);
+
             printParseTree(parse_tree, argv[2]);
 
             printf(ANSI_COLOR_GREEN ANSI_COLOR_BOLD
                    "\n"
                    "-----------------------------------------------------------"
-                   "----------"
-                   "\n" ANSI_COLOR_RESET);
+                   "----------\n" ANSI_COLOR_RESET);
             printf(ANSI_COLOR_GREEN ANSI_COLOR_BOLD
                    "Total CPU Time: %f\n" ANSI_COLOR_RESET,
                    total_cpu_time);
@@ -152,9 +167,9 @@ take_input:
                    total_cpu_time_in_seconds);
             printf(ANSI_COLOR_GREEN ANSI_COLOR_BOLD
                    "-----------------------------------------------------------"
-                   "----------"
-                   "\n\n" ANSI_COLOR_RESET);
+                   "----------\n" ANSI_COLOR_RESET);
 
+            clear_tree(parse_tree);
             goto take_input;
         }
 

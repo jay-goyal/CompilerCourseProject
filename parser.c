@@ -13,6 +13,7 @@ ARYAN BANSAL - 2021A7PS2776P
 #include <fcntl.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <strings.h>
 #include <unistd.h>
 
 #include "helper.h"
@@ -309,8 +310,7 @@ tree_t *parseInputSourceCode(pt_t pt, char *src_filename, ht_t *symbol_table) {
                    "\n" ANSI_COLOR_RESET,
                    ret_token.line_no);
         printf(ANSI_COLOR_RED ANSI_COLOR_BOLD
-               "\n\nSyntax Error, Tokens after _main function provided "
-               "run\n\n" ANSI_COLOR_RESET);
+               "\nSyntax Errors Reported\n" ANSI_COLOR_RESET);
     }
 
     free(bottom);
