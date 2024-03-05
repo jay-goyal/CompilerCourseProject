@@ -132,12 +132,13 @@ take_input:
 
             tree_t* parse_tree =
                 parseInputSourceCode(pt, argv[1], symbol_table);
-            printParseTree(parse_tree, argv[2]);
-
             end_time = clock();
             total_cpu_time =
                 (double)(end_time - start_time) + gen_total_cpu_time;
             total_cpu_time_in_seconds = total_cpu_time / CLOCKS_PER_SEC;
+
+            printParseTree(parse_tree, argv[2]);
+
             printf(ANSI_COLOR_GREEN ANSI_COLOR_BOLD
                    "\n"
                    "-----------------------------------------------------------"
